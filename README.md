@@ -84,7 +84,7 @@ Pick a narrative frame from the set of hand-made narrative frames that matches t
 
 #### Narrative Frame Example:  
 
-**(Character X about to attack Character Y)**
+*(Character X about to attack Character Y)*
 
 ```
 {
@@ -100,7 +100,7 @@ Pick a narrative frame from the set of hand-made narrative frames that matches t
 
 From this, you would create a short paragraph (using the event attributes, character_X emotion, and the last two pairs of dialog) to condition the next bit of generation. For example, the above frame would be converted to the following via simple slot filling language generation:
 
-**Text for Conditioning:**
+*Text for Conditioning:*
 
 Character_X is angry. Character_X is holding a knife. Character X is standing up. Character_Y is in front of Character_X.
 
