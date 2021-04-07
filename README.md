@@ -56,19 +56,19 @@ Further details for each component are provided below.
 
 This component is responsible for producing text with which to condition the transformers in the Dialog Generator and Narrative Planner.
 
-### Input
+**Input**
 
 -   Screen direction / action
 
 -   The current and next emotion in the emotional arc
 
-### Output
+**Output**
 
 -   Text with which to condition later generation
 
 -   i.e. screen direction / action, dialog
 
-### Mechanism
+**Mechanism**
 
 Pick a narrative frame from the set of hand-made narrative frames that matches the expected input and output emotions for the next narrative event and dialog. For each of the event attributes in the frame, use a span retrieval transformer to find the associated property in the story text so far.
 
@@ -118,7 +118,7 @@ While transformers are good at producing syntactically correct sentences, they o
 
 Building off the work done by the students in CS 338 this quarter, this component consists of 6 transformers each trained on a set of dialogs coded with one of the 6 discrete emotions in the EmotionLines dataset [1].
 
-### Input
+**Input**
 
 -   Screen direction / action
 
@@ -126,7 +126,7 @@ Building off the work done by the students in CS 338 this quarter, this componen
 
 -   The emotion of the utterance to generate
 
-### Output
+**Output**
 
 -   The next utterances (call and response) of the characters
 
@@ -134,13 +134,13 @@ Building off the work done by the students in CS 338 this quarter, this componen
 
 This component consists of a generative transformer (e.g. GPT-2 [2]) to help drive the narrative forward by generating additional scene setup and action to go along with the dialog. This model should be fine-tuned with datasets such as RocStories [3] or GLUCOSE [4] in order to help it better generate causally coherent and meaningful actions for the script.
 
-### Input
+**Input**
 
 -   Screen direction / action
 
 -   The last two character utterances
 
-### Output
+**Output**
 
 -   Screen direction / action
 
