@@ -1,0 +1,14 @@
+name: narrative-gen
+channels:
+  - pytorch
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.7,<3.9
+  - pytorch
+  - transformers
+  - numpy
+  - tqdm
+  - nltk
+  - pip
