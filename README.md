@@ -1,6 +1,8 @@
 # Narrative Generation Proposal
 
-Marko Sterbentz, Cameron Barrie, Harkirat Gill, Simon Benigeri
+Marko Sterbentz
+
+Cameron Barrie, Harkirat Gill, Simon Benigeri
 
 March 2021
 
@@ -26,7 +28,13 @@ Over the past few years, language models have shown incredible promise in their 
 
 ## System Architecture
 
-The core of the system I am proposing consists of three main components: 1) a context builder that uses the past story sequence and emotional arc to produce text sequences that can better condition the generation of the transformers, 2) a dialog generator that uses six distinct transformers to generate dialog, and 3) a narrative planner that uses a transformer to generate screen direction/action to intersperse with the dialog and help drive the plot forward. The context builder plays a critical role in ensuring that the dialog generator and narrative planner make use of relevant details that have already been generated as part of the script when determining what to write next. It gathers past details based on a narrative frame that matches the current emotional goals of the story. These narrative frames have associated questions that can be used to fill the slots of the frame and, once filled, can produce the text to condition the transformers with.
+The core of the system I am proposing consists of three main components: 
+
+1. a **context builder** that uses the past story sequence and emotional arc to produce text sequences that can better condition the generation of the transformers, 
+2. a **dialog generator** that uses six distinct transformers to generate dialog, and 
+3. a **narrative planner** that uses a transformer to generate screen direction/action to intersperse with the dialog and help drive the plot forward. 
+
+The context builder plays a critical role in ensuring that the dialog generator and narrative planner make use of relevant details that have already been generated as part of the script when determining what to write next. It gathers past details based on a narrative frame that matches the current emotional goals of the story. These narrative frames have associated questions that can be used to fill the slots of the frame and, once filled, can produce the text to condition the transformers with.
 
 Further details for each component are provided below.
 

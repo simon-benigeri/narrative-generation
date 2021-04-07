@@ -1,2 +1,5 @@
 /data
 /notebooks
+
+**.DS_STORE
+**.idea
