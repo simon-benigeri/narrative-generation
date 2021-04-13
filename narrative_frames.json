@@ -1,0 +1,11 @@
+[
+    {
+        "character_x_emotion": ["anger"],
+        "character_y_emotion": ["surprise", "anger", "fear"],
+        "event_attributes": {
+            "Character_X is holding <object>": "What is Character_X holding?",
+            "Character_X is <position/location>": "Where is Character_X?",
+            "Character_Y is <position/location>": "Where is Character_Y?"
+        }
+    }
+]

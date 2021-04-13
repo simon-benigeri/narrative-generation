@@ -1,30 +1,42 @@
+import NarrativeFrameCollection, ContextBuilder, DialogueGenerator, NarrativePlanner
 
-
-
+"""
+Controller class to generate script using components
+"""
 class NarrativeController:
     def __init__(self):
-
-        self.narrative_frame_set = 
-
-        self.context_builder = 
-        self.dialogue_generator = 
-        self.narrative_planner = 
+        # Initialize components
+        self.narrative_frame_collection = NarrativeFrameCollection()
+        self.context_builder = ContextBuilder()
+        self.dialogue_generator = DialogueGenerator()
+        self.narrative_planner = NarrativePlanner()
     
-    def generate(self, emotion_arc, narrative_frames):
-        script = 
+    # Generate narrative script using components
+    def generate_script(self, emotion_arc):
+        # Initialize script
+        script = Script(arc=emotion_arc)
 
-        # Step through emotion arc and generate
-        for e in arc:
-            while # personX.emotion is not target_emotion
+        # Generate while script is not complete
+        while not script.complete:
 
-                while # some other condition
-                    # build context
+            while # personX.emotion is not target_emotion or some condition to stay at this stage of the arc - needed?
 
-                    # dialogue
-                    # add to script
+                # Generate dialogue
+                while # (keep talking) some condition to continue dialogue in this arc stage?
+                    # Generate context
+                    context_text = context_builder(script)
 
-                # narrate
-                # add to script
-        
-        return script
+                    # Generate dialogue
+                    dialogue = dialogue_generator.generate_utterances(script)
+                    script.append_dialogue(dialogue)
+
+                # Generate screen direction
+                while # (keep narrating) some condition to continue narration in this arc stage?
+                    direction = narrative_planner.generate_direction(script)
+                    script.append_direction(direction)
+            
+            # Step to next stage in the story arc
+            script.arc_step()
+
+        return script.to_str()
 
