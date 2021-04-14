@@ -1,4 +1,4 @@
-import NarrativeFrameCollection, ContextBuilder, DialogueGenerator, NarrativePlanner
+import NarrativeFrameCollection, ContextBuilder, DialogueGenerator, NarrativePlanner, Script
 
 """
 Controller class to generate script using components
