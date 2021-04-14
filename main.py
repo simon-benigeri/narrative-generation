@@ -1,3 +1,5 @@
+from system.NarrativeController import NarrativeController
+from system.Emotions import Emotions
 import argparse
 from typing import List
 
@@ -8,9 +10,8 @@ parser.add_argument("--dirX", type=List[str], default=["Character_X is holding a
 parser.add_argument("--dirY", type=List[str], default=["Character_Y in front of Character_X"], help="Initial directions for Character Y.")
 args = vars(parser.parse_args())
 
+if __name__ =='__main__':
+    narrative_controller = NarrativeController()
 
-def main(args):
-    pass
-
-if __name__=='__main__':
-    main(args)
+    
+    print(narrative_controller.generate_script(arc))

@@ -1,4 +1,5 @@
-
+from .Script import Script
+from .Emotions import Emotions
 
 """
 Component to generate dialogue between characters
@@ -6,22 +7,18 @@ Component to generate dialogue between characters
 class DialogueGenerator:
     def __init__(self):
         # Load all transformers
-        self.happy_transformer = "happy dialogue"
-        self.sad_transformer = "sad dialogue"
-        self.anger_transformer = "angry dialogue"
+        # self.happy_transformer = ...
         # ...
 
         # Dictionary for emotion and corresponding transformer
         self.transformers = {
-            "HAPPY": self.happy_transformer,
-            "SAD": self.sad_transformer,
-            "ANGER": self.anger_transformer# ,
+            # Emotions.HAPPINESS: self.happy_transformer,
             # ...
         }
     
     # Generate next character utterances given direction and past utterences
-    def generate_utterances(self, emotion:str, prev_direction:str, prev_utterance:str):
-        # Generate utterances
+    def generate_dialogue(self, script:Script):
+        # Generate dialogue
         # ...
 
-        return utterances
+        return ["X:what emotion are you?", "Y:im happy"]

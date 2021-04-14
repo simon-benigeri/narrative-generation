@@ -1,5 +1,6 @@
 from collections import namedtuple
 from typing import List
+from .Emotions import Emotions
 
 """
 Component to hold the script
@@ -14,10 +15,12 @@ class Script:
         self.CHARACTER_X = 'Character_X'
         self.CHARACTER_Y = 'Character_Y'
 
-        # Set story arc
+        # Set story arc and current arc stage
         self.arc = arc
         self.current_arc_stage = 0
-        self.complete = False
+
+        # Set story complete to false unless arc list is empty
+        self.complete = len(self.arc) == 0
 
         # List of lines in the script
         self.script_lines = []
@@ -34,17 +37,15 @@ class Script:
         else:
             self.complete = True
 
-    # Append list of utterances to script
-    def append_dialogue(self, character: str, utterances: List[str]):
-        for u in utterances:
-            self.script_lines.append(
-                self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.UTTERANCE, character, u))
+    # Append utterance to script
+    def append_utterance(self, character: str, utterance: str):
+        self.script_lines.append(
+            self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.UTTERANCE, character, utterance))
     
     # Append direction to script
-    def append_direction(self, character: str, directions: List[str]):
-        for d in directions:
-            self.script_lines.append(
-                self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.DIRECTION, character, d))
+    def append_direction(self, character: str, direction: str):
+        self.script_lines.append(
+            self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.DIRECTION, character, direction))
 
     # Get the last n utterances from the script
     def get_prev_utterances(self, n: int, character: str):
@@ -101,6 +102,10 @@ class Script:
                 count += 1
         return prev
     
+    # Save script to file
+    def save(self, file_path):
+        pass
+    
     # Convert script to string
     def __str__(self):
         script_str = ""
@@ -109,7 +114,7 @@ class Script:
         return script_str
 
 if __name__ =='__main__':
-    arc = ['sad', 'happy']
+    arc = [Emotions.SADNESS, Emotions.HAPPINESS]
     s = Script(arc)
     N = 3
     utterances = [f"utterance {i}" for i in range(N)]

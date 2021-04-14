@@ -1,4 +1,4 @@
-
+from .Script import Script
 
 """
 Component to generate script direction and guide story
@@ -6,11 +6,12 @@ Component to generate script direction and guide story
 class NarrativePlanner:
     def __init__(self):
         # Load transformer
-        self.transformer = ...
+        #self.transformer = ...
+        pass
     
     # Generate screen direction given past direction and utterences
-    def generate_planner(self, prev_direction:str, prev_utterances:str):
+    def generate_direction(self, script:Script):
         # Generate direction
         # ...
 
-        return direction
+        return "then he stabbed him"

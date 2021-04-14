@@ -10,8 +10,7 @@ class NarrativeFrameCollection:
             self.frames = json.load(json_file)
     
     # Get all frames from collection
-    def select_all(self):
+    def retrieve_all(self):
         return self.frames
     
-    # Maybe other methods to get a certain subset of frames
-    # ...
+    # Maybe other retrieve methods to get a certain subset of frames for future steps
