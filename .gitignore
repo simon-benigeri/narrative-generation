@@ -1,5 +1,6 @@
 /data
 /notebooks
+/saved_models
 
 **.DS_STORE
 **.idea

@@ -43,7 +43,7 @@ class Script:
             self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.UTTERANCE, character, utterance))
     
     # Append direction to script
-    def append_direction(self, character: str, direction: str):
+    def append_direction(self, direction: str, character: str=None):
         self.script_lines.append(
             self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.DIRECTION, character, direction))
 

@@ -1,5 +1,6 @@
 from system.NarrativeController import NarrativeController
 from system.Emotions import Emotions
+from system.Script import Script
 import argparse
 from typing import List
 
@@ -11,7 +12,24 @@ parser.add_argument("--dirY", type=List[str], default=["Character_Y in front of 
 args = vars(parser.parse_args())
 
 if __name__ =='__main__':
+    print("Initializing narrative contoller...")
     narrative_controller = NarrativeController()
 
+    short_arc = [Emotions.HAPPINESS, Emotions.FEAR]
+    long_arc = [Emotions.HAPPINESS, Emotions.FEAR, Emotions.SADNESS, Emotions.ANGER, Emotions.HAPPINESS]
+
+    # Define story starting point...
+    initial_script = Script(arc=short_arc)
+
+    initial_script.append_direction(direction="Once upon a time, there lived a man named character x")
+    initial_script.append_direction(direction="He lived a happy life")
+    initial_script.append_utterance(character="Character x", utterance="I am very happy!")
+
+    initial_script.arc_step()
+
+    # Generate the rest of the script
+    print("Generating script...")
+    generated_script = narrative_controller.generate_script(arc=initial_script.arc, initial_script=initial_script)
     
-    print(narrative_controller.generate_script(arc))
+    print("\nGENERATED SCRIPT")
+    print(generated_script)

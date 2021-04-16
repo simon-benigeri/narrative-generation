@@ -15,7 +15,7 @@ class NarrativePlanner:
         self.D = 1
         # configuration = GPT2Config.from_pretrained('gpt2-large', output_hidden_states=False)
         # self.generator = GPT2LMHeadModel.from_pretrained('gpt2-large', )
-        self.generator = pipeline(task='text-generation', model='gpt2-large', framework='pt')
+        #self.generator = pipeline(task='text-generation', model='gpt2-large', framework='pt')
         pass
 
     def retrieve_prompt(self, script:Script):
@@ -30,10 +30,12 @@ class NarrativePlanner:
     def generate_direction(self, script:Script):
         # Generate direction
         # ...
-        prompt = self.retrieve_prompt(script=script)
-        direction = self.generator(text_inputs=prompt, return_full_text=True, max_len=50, early_stopping=True)
 
-        return direction
+        #prompt = self.retrieve_prompt(script=script)
+        #direction = self.generator(text_inputs=prompt, return_full_text=True, max_len=50, early_stopping=True)
+
+        # dummy output
+        return "(screen direction)"
 
 
 

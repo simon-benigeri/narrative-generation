@@ -11,37 +11,33 @@ class NarrativeController:
     def __init__(self):
         # Initialize components
         self.narrative_frame_collection = NarrativeFrameCollection()
+
         self.context_builder = ContextBuilder()
         self.dialogue_generator = DialogueGenerator()
         self.narrative_planner = NarrativePlanner()
     
     # Generate narrative script using components
-    def generate_script(self, arc):
-        # Initialize script
-        script = Script(arc=arc)
+    def generate_script(self, arc, initial_script:Script=None):
+        # Initialize script if initial script not given
+        if not initial_script:
+            script = Script(arc=arc)
+        else:
+            script = initial_script
 
         # Generate while script is not complete
         while not script.complete:
 
-            # while personX.emotion is not target_emotion or some condition to stay at this stage of the arc - needed?
-            for _ in [1]: # temp loop
+            # Generate context
+            context_text = self.context_builder.generate_context(script, self.narrative_frame_collection)
 
-                # Generate dialogue
-                # while (keep talking) some condition to continue dialogue in this arc stage?
-                for _ in [1]: # temp loop
-                    # Generate context
-                    context_text = self.context_builder.generate_context(script, self.narrative_frame_collection)
+            # Generate dialogue
+            utterances = self.dialogue_generator.generate_dialogue(script)
+            for utterance in utterances:
+                script.append_utterance(utterance[0], utterance[1])
 
-                    # Generate dialogue
-                    utterances = self.dialogue_generator.generate_dialogue(script)
-                    for utterance in utterances:
-                        script.append_utterance('?', utterance)
-
-                # Generate screen direction
-                # while (keep narrating) some condition to continue narration in this arc stage?
-                for _ in [1]: # temp loop
-                    direction = self.narrative_planner.generate_direction(script)
-                    script.append_direction('?', direction)
+            # Generate screen direction
+            direction = self.narrative_planner.generate_direction(script)
+            script.append_direction(direction)
             
             # Step to next stage in the story arc
             script.arc_step()
