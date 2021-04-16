@@ -9,7 +9,7 @@ class Script:
     # Named tuple for a single line in the script
     ScriptLine = namedtuple('ScriptLine', ['line_num', 'arc_stage', 'type', 'character','text'])
 
-    def __init__(self, arc: List[str]):
+    def __init__(self, arc: List[Emotions]):
         self.DIRECTION = 0
         self.UTTERANCE = 1
         self.CHARACTER_X = 'Character_X'
@@ -78,7 +78,7 @@ class Script:
         return prev_directions
 
         # Get the last n directions from the script
-    def get_prev_lines(self, n: int, type: int, character: str):
+    def get_prev_lines(self, n: int, type: int, character: str=None):
         """
         returns previous utterances or screen directions for a character
         Args:
@@ -97,7 +97,7 @@ class Script:
                 break
             index -= 1
             line = self.script_lines[index]
-            if line.type == type and line.character == character:
+            if line.type == type and (not character or line.character == character):
                 prev.insert(0, line)
                 count += 1
         return prev
@@ -110,7 +110,10 @@ class Script:
     def __str__(self):
         script_str = ""
         for l in self.script_lines:
-            script_str += f"{l.character} : {l.text}" + "\n"
+            if l.type == self.UTTERANCE:
+                script_str += f"{l.character} : {l.text}" + "\n"
+            elif l.type == self.DIRECTION:
+                script_str += f"{l.text}" + "\n"
         return script_str
 
 if __name__ =='__main__':
@@ -120,8 +123,8 @@ if __name__ =='__main__':
     utterances = [f"utterance {i}" for i in range(N)]
     directions = [f"direction {i}" for i in range(N)]
     for u, d in zip(utterances, directions):
-        s.append_dialogue(s.CHARACTER_X, [u])
-        s.append_dialogue(s.CHARACTER_Y, [u])
+        s.append_utterance(s.CHARACTER_X, u)
+        s.append_utterance(s.CHARACTER_Y, u)
         s.append_direction(s.CHARACTER_X, d)
         s.append_direction(s.CHARACTER_Y, d)
 
