@@ -2,18 +2,19 @@ from operator import itemgetter, attrgetter
 from system.Script import Script
 from system.Emotions import Emotions
 from transformers import pipeline
+from transformers import GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
+
 
 """
 Component to generate script direction and guide story
-datasets: GLUCOSE from datasets import load_dataset
-
-dataset = load_dataset("glucose")
 """
 class NarrativePlanner:
     def __init__(self):
         # Load transformer
         self.U = 2
         self.D = 1
+        # configuration = GPT2Config.from_pretrained('gpt2-large', output_hidden_states=False)
+        # self.generator = GPT2LMHeadModel.from_pretrained('gpt2-large', )
         self.generator = pipeline(task='text-generation', model='gpt2-large', framework='pt')
         pass
 
@@ -21,8 +22,8 @@ class NarrativePlanner:
         lines = script.get_prev_lines(n=self.D, type=script.DIRECTION)
         lines += script.get_prev_lines(n=self.U, type=script.UTTERANCE)
         lines.sort(key=attrgetter('line_num'))
-        texts = [f"{line.character} : {line.text}" if line.type == script.UTTERANCE else line.text for line in lines]
-        prompt = '\n'.join(texts)
+        texts = [f'{line.character}  said, "{line.text}"' if line.type == script.UTTERANCE else line.text for line in lines]
+        prompt = ' '.join(texts)
         return prompt
 
     # Generate screen direction given past direction and utterences
@@ -30,7 +31,7 @@ class NarrativePlanner:
         # Generate direction
         # ...
         prompt = self.retrieve_prompt(script=script)
-        direction = self.generator(text_inputs=prompt, return_full_text=True, max_len=30)
+        direction = self.generator(text_inputs=prompt, return_full_text=True, max_len=50, early_stopping=True)
 
         return direction
 
