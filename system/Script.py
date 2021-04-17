@@ -38,7 +38,7 @@ class Script:
             self.complete = True
 
     # Append utterance to script
-    def append_utterance(self, character: str, utterance: str):
+    def append_utterance(self, utterance: str, character: str):
         self.script_lines.append(
             self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.UTTERANCE, character, utterance))
     
@@ -123,10 +123,10 @@ if __name__ =='__main__':
     utterances = [f"utterance {i}" for i in range(N)]
     directions = [f"direction {i}" for i in range(N)]
     for u, d in zip(utterances, directions):
-        s.append_utterance(s.CHARACTER_X, u)
-        s.append_utterance(s.CHARACTER_Y, u)
-        s.append_direction(s.CHARACTER_X, d)
-        s.append_direction(s.CHARACTER_Y, d)
+        s.append_utterance(u, s.CHARACTER_X)
+        s.append_utterance(u, s.CHARACTER_Y)
+        s.append_direction(d, s.CHARACTER_X)
+        s.append_direction(d, s.CHARACTER_Y)
 
     print(str(s))
 

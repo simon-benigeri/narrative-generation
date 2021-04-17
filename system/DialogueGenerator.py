@@ -2,7 +2,7 @@ from .Script import Script
 from .Emotions import Emotions
 
 import torch
-from transformers import GPT2LMHeadModel,  GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
+from transformers import GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
 
 """
 Component to generate dialogue between characters
@@ -86,7 +86,7 @@ class DialogueGenerator:
                                         top_k=50,
                                         max_length = 300,
                                         top_p=0.90,
-                                        num_return_sequences=2
+                                        num_return_sequences=
                                     )
 
         # Not currently a list of sequential utterances
@@ -98,6 +98,6 @@ class DialogueGenerator:
         # Return list of character, utteance pairs
         character_utterances = []
         for g in generated:
-            character_utterances.append(("Character ?", g))
+            character_utterances.append((g, "Character ?"))
         
         return character_utterances

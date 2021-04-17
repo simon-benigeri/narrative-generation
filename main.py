@@ -23,7 +23,7 @@ if __name__ =='__main__':
 
     initial_script.append_direction(direction="Once upon a time, there lived a man named character x")
     initial_script.append_direction(direction="He lived a happy life")
-    initial_script.append_utterance(character="Character x", utterance="I am very happy!")
+    initial_script.append_utterance(utterance="I am very happy!", character="Character x")
 
     initial_script.arc_step()
 

@@ -33,6 +33,7 @@ class NarrativeController:
             # Generate dialogue
             utterances = self.dialogue_generator.generate_dialogue(script)
             for utterance in utterances:
+                #TODO: not sure if we are appending utterances right here
                 script.append_utterance(utterance[0], utterance[1])
 
             # Generate screen direction
