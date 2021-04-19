@@ -1,4 +1,3 @@
-from typing import List
 from system.NarrativeFrameCollection import NarrativeFrameCollection
 from system.Script import Script
 
@@ -11,6 +10,7 @@ class ContextBuilder:
     def __init__(self):
         # ...
         #TODO: make out own model
+        # the model we use is here: https://huggingface.co/deepset/roberta-base-squad2
         model_name = "deepset/roberta-base-squad2"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
