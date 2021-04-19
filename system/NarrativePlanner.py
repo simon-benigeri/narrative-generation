@@ -36,6 +36,7 @@ class NarrativePlanner:
 
     def retrieve_prompt(self, script:Script):
         #TODO: Review get_prev_lines because theres a smarter way to so this
+        # https://towardsdatascience.com/how-to-fine-tune-gpt-2-so-you-can-generate-long-form-creative-writing-7a5ae1314a61
         lines = script.get_prev_lines(n=1, type=script.DIRECTION) \
                 + script.get_prev_lines(n=2, type=script.UTTERANCE)
         lines.sort(key=attrgetter('line_num'))
