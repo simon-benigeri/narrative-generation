@@ -107,7 +107,13 @@ if __name__=='__main__':
     model_name = "deepset/roberta-base-squad2"
 
     # a) Get predictions
-    # nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
+    nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
+    QA_input = {
+        'question': 'Where is Bob located?',
+        'context': 'Bob is in his bedroom. Alice is in the kitchen. Alice calls Bob and asks him to come to the kitchen. Bob is in the kitchen.'
+    }
+    res = nlp(QA_input)
+    print(res)
     """
     
     QA_input = {
