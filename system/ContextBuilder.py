@@ -1,10 +1,13 @@
-from system.NarrativeFrameCollection import NarrativeFrameCollection
-from system.Script import Script
+from .NarrativeFrameCollection import NarrativeFrameCollection
+from .Script import Script
+from .Character import Character
 from typing import List, Tuple
 import re
+import random
 
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 import torch
+
 """
 Component to condition dialogue generation
 """
@@ -17,39 +20,47 @@ class ContextBuilder:
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
 
-    def select_frame(self, script:Script, narrative_frame_collection: NarrativeFrameCollection) -> dict:
-        # Get emotions of current arc stage
-        arc_stage = script.get_current_arc_stage()
-
+    """ Select a narrative frame to build context around """
+    def select_frame(self, script:Script, characters: List[Character], narrative_frame_collection: NarrativeFrameCollection) -> dict:
         # Gat available frames
         frames = narrative_frame_collection.retrieve_all()
 
-        # Look through frames for emotion frames
-        # TODO random selection between all valid frames
-        # TODO - getting wrong one
-        selected_frame = None
+        # Look through frames for emotion matches
+        candidate_frames = []
         for frame in frames:
             # If current emotions match frame for both characters, break and use this frame
-            if arc_stage[0].name.lower() in frame["character_x_emotion"] and arc_stage[1].name.lower() in frame["character_y_emotion"]:
-                selected_frame = frame
+            if characters[0].current_emotion().name.lower() in frame["character_x_emotion"] and characters[1].current_emotion().name.lower() in frame["character_y_emotion"]:
+                candidate_frames.append(frame)
                 break
 
-        return selected_frame
+        # TODO: Figure out bindings
+
+        # Select one of the candidate frames randomly
+        return random.choice(candidate_frames), [(characters[0], "Character_X"),  (characters[1], "Character_Y")]
     
-    def answer_frame_questions(self, script:Script, frame:dict) -> List[str]:
-        # Iterate over questions and fill event text
-        contextualized_events = []
+    """ Answer questions from the frame and add fill in event attribute text """
+    def contextualize_event_attributes(self, script:Script, character_bindings:List[Tuple], frame:dict) -> List[str]:
+        # Iterate over questions and fill event attribute text
+        contextualized_attributes = []
         for event_attribute in frame["event_attributes"]:
-
-            # Get answer to event question given entire script
+            # Get answer to event attribute question given entire script
             answer = self.answer_question(question=event_attribute["question"], context=str(script))
+
+            # Skip if no answer found
+            if answer == "" or answer == "<s>":
+                continue
             
-            # Fill answer in event text and add to list
-            contextualized_event = re.sub("<.+>", answer, event_attribute["event"])
-            contextualized_events.append(contextualized_event)
+            # Bind character to event attribute
+            for character, character_placeholder in character_bindings:
+                contextualized_attribute = re.sub(character_placeholder, character.name, event_attribute["attribute"])
 
-        return contextualized_events
+            # Fill answer in event attribute text and add to list
+            contextualized_attribute = re.sub("<.+>", answer, event_attribute["attribute"])
+            contextualized_attributes.append(contextualized_attribute)
 
+        return contextualized_attributes
+
+    """ Answer a question given a context """
     def answer_question(self, question: str, context: str) -> str:
         """
         Answers 1 question given the context and the question
@@ -79,15 +90,16 @@ class ContextBuilder:
 
         return answer
 
-    
-    def generate_context(self, script:Script, narrative_frame_collection:NarrativeFrameCollection) -> str:
-        # Select matching narrative frame
-        frame = self.select_frame(script, narrative_frame_collection)
+    """ Generate context text used to condition later generators """
+    def generate_context(self, script:Script, characters: List[Character], narrative_frame_collection:NarrativeFrameCollection) -> str:
+        # Select matching narrative frame and bindings for characters
+        frame, character_bindings = self.select_frame(script, characters, narrative_frame_collection)
 
-        # Find properties of attributes from story
-        contextualized_events = self.answer_frame_questions(script, frame)
+        # Fill in event attributes from context
+        contextualized_attributes = self.contextualize_event_attributes(script, character_bindings, frame)
 
-        return " ".join(contextualized_events)
+        # Join centextualized events into string
+        return " ".join(contextualized_attributes)
 
 if __name__=='__main__':
     from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
