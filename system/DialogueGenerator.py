@@ -86,7 +86,7 @@ class DialogueGenerator:
                                         top_k=50,
                                         max_length = 300,
                                         top_p=0.90,
-                                        num_return_sequences=
+                                        num_return_sequences=2
                                     )
 
         # Not currently a list of sequential utterances

@@ -1,5 +1,7 @@
 from system.NarrativeFrameCollection import NarrativeFrameCollection
 from system.Script import Script
+from typing import List, Tuple
+import re
 
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer
 import torch
@@ -14,6 +16,39 @@ class ContextBuilder:
         model_name = "deepset/roberta-base-squad2"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
+
+    def select_frame(self, script:Script, narrative_frame_collection: NarrativeFrameCollection) -> dict:
+        # Get emotions of current arc stage
+        arc_stage = script.get_current_arc_stage()
+
+        # Gat available frames
+        frames = narrative_frame_collection.retrieve_all()
+
+        # Look through frames for emotion frames
+        # TODO random selection between all valid frames
+        # TODO - getting wrong one
+        selected_frame = None
+        for frame in frames:
+            # If current emotions match frame for both characters, break and use this frame
+            if arc_stage[0].name.lower() in frame["character_x_emotion"] and arc_stage[1].name.lower() in frame["character_y_emotion"]:
+                selected_frame = frame
+                break
+
+        return selected_frame
+    
+    def answer_frame_questions(self, script:Script, frame:dict) -> List[str]:
+        # Iterate over questions and fill event text
+        contextualized_events = []
+        for event_attribute in frame["event_attributes"]:
+
+            # Get answer to event question given entire script
+            answer = self.answer_question(question=event_attribute["question"], context=str(script))
+            
+            # Fill answer in event text and add to list
+            contextualized_event = re.sub("<.+>", answer, event_attribute["event"])
+            contextualized_events.append(contextualized_event)
+
+        return contextualized_events
 
     def answer_question(self, question: str, context: str) -> str:
         """
@@ -45,16 +80,14 @@ class ContextBuilder:
         return answer
 
     
-    def generate_context(self, script:Script, narrative_frame_collection:NarrativeFrameCollection):
+    def generate_context(self, script:Script, narrative_frame_collection:NarrativeFrameCollection) -> str:
         # Select matching narrative frame
-        # ...
+        frame = self.select_frame(script, narrative_frame_collection)
 
         # Find properties of attributes from story
-        # ...
+        contextualized_events = self.answer_frame_questions(script, frame)
 
-        # Do we just use those event attributes as the conditioning text?
-
-        return "billy was holding a knife"
+        return " ".join(contextualized_events)
 
 if __name__=='__main__':
     from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline

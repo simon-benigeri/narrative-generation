@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import List
+from typing import List, Tuple
 from .Emotions import Emotions
 
 """
@@ -9,7 +9,7 @@ class Script:
     # Named tuple for a single line in the script
     ScriptLine = namedtuple('ScriptLine', ['line_num', 'arc_stage', 'type', 'character','text'])
 
-    def __init__(self, arc: List[Emotions]):
+    def __init__(self, arc: List[Tuple[Emotions]]):
         self.DIRECTION = 0
         self.UTTERANCE = 1
         self.CHARACTER_X = 'Character_X'
@@ -36,6 +36,10 @@ class Script:
         # Otherwise, set script to complete
         else:
             self.complete = True
+    
+    # Get current stage of arc
+    def get_current_arc_stage(self):
+        return self.arc[self.current_arc_stage]
 
     # Append utterance to script
     def append_utterance(self, utterance: str, character: str):
@@ -77,7 +81,7 @@ class Script:
                 count += 1
         return prev_directions
 
-        # Get the last n directions from the script
+    # Get the last n directions from the script
     def get_prev_lines(self, n: int, type: int, character: str=None):
         """
         returns previous utterances or screen directions for a character

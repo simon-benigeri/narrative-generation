@@ -1,11 +1,37 @@
 [
     {
+        "description": "Character_X is looking for Character_Y",
+        "character_x_emotion": ["anger"],
+        "character_y_emotion": ["happy"],
+        "event_attributes": [
+            {
+                "event": "Character_X goes to <position/location>.",
+                "question": "Where is Character_X going?"
+            },
+            {
+                "event": "Character_Y is at <position/location>.",
+                "question": "Where is Character_Y?"
+            }
+        ]
+    },
+
+    {
+        "description": "Character_X confronts Character_Y with violent intentions",
         "character_x_emotion": ["anger"],
         "character_y_emotion": ["surprise", "anger", "fear"],
-        "event_attributes": {
-            "Character_X is holding <object>": "What is Character_X holding?",
-            "Character_X is <position/location>": "Where is Character_X?",
-            "Character_Y is <position/location>": "Where is Character_Y?"
-        }
+        "event_attributes": [
+            {
+                "event": "Character_X is holding <object>.",
+                "question": "What is Character_X holding?"
+            },
+            {
+                "event": "Character_X is <position/location>.",
+                "question": "Where is Character_X?"
+            },
+            {
+                "event": "Character_Y is <position/location>.",
+                "question": "Where is Character_Y?"
+            }
+        ]
     }
 ]

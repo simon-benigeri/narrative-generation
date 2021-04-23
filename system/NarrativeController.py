@@ -13,8 +13,8 @@ class NarrativeController:
         self.narrative_frame_collection = NarrativeFrameCollection()
 
         self.context_builder = ContextBuilder()
-        self.dialogue_generator = DialogueGenerator()
-        self.narrative_planner = NarrativePlanner()
+        #self.dialogue_generator = DialogueGenerator()
+        #self.narrative_planner = NarrativePlanner()
     
     # Generate narrative script using components
     def generate_script(self, arc, initial_script:Script=None):
@@ -26,9 +26,10 @@ class NarrativeController:
 
         # Generate while script is not complete
         while not script.complete:
-
             # Generate context
             context_text = self.context_builder.generate_context(script, self.narrative_frame_collection)
+
+            return context_text
 
             # Generate dialogue
             utterances = self.dialogue_generator.generate_dialogue(script)

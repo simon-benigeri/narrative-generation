@@ -15,8 +15,11 @@ if __name__ =='__main__':
     print("Initializing narrative contoller...")
     narrative_controller = NarrativeController()
 
-    short_arc = [Emotions.HAPPINESS, Emotions.FEAR]
-    long_arc = [Emotions.HAPPINESS, Emotions.FEAR, Emotions.SADNESS, Emotions.ANGER, Emotions.HAPPINESS]
+    short_arc = [
+            (Emotions.ANGER, Emotions.HAPPINESS),
+            (Emotions.ANGER, Emotions.FEAR),
+            (Emotions.HAPPINESS, Emotions.SADNESS),
+        ]
 
     # Define story starting point...
     initial_script = Script(arc=short_arc)
