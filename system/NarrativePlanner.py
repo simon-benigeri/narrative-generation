@@ -1,6 +1,7 @@
 from operator import attrgetter
 import torch
 from transformers import GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
+import os
 
 from system.Script import Script
 from system.Planners import Planners
@@ -17,7 +18,8 @@ class NarrativePlanner:
             Planners.DEFAULT: 'gpt2-large',
             Planners.ROCStories__spring2016: 'gpt2-large__ROCStories__spring2016',
             Planners.ROCStories__winter2017: 'gpt2-large__ROCStories__winter2017',
-            Planners.ROCStories__full: 'gpt2-large__ROCStories__full',
+            # Planners.ROCStories__full: 'gpt2-large__ROCStories__full',
+            Planners.ROCStories__full: '../models/ROCStories_full/model_save',
             Planners.GLUCOSE: 'gpt2-large__GLUCOSE'
         }
         # narrative_models_dir = "saved_models/narrative_planner_models/"
@@ -25,14 +27,21 @@ class NarrativePlanner:
 
         # Load tokenizer and set configuration for transformers
         # TODO: USE paths when we have saved models
-        self.tokenizer = GPT2Tokenizer.from_pretrained(self.planners[planner], bos_token='<|startoftext|>',
-                                                       eos_token='<|endoftext|>', pad_token='<|pad|>')
-        configuration = GPT2Config.from_pretrained(self.planners[planner], output_hidden_states=False)
+        if self.planners[planner] == Planners.DEFAULT:
+            self.tokenizer = GPT2Tokenizer.from_pretrained(self.planners[planner], bos_token='<|startoftext|>',
+                                                           eos_token='<|endoftext|>', pad_token='<|pad|>')
+            configuration = GPT2Config.from_pretrained(self.planners[planner], output_hidden_states=False)
 
-        # Initialize transformer...
-        self.narrative_transformer = GPT2LMHeadModel.from_pretrained(self.planners[planner], config=configuration)
-        self.narrative_transformer.resize_token_embeddings(len(self.tokenizer))
-        self.narrative_transformer.eval()
+            # Initialize transformer...
+            self.narrative_transformer = GPT2LMHeadModel.from_pretrained(self.planners[planner], config=configuration)
+            self.narrative_transformer.resize_token_embeddings(len(self.tokenizer))
+            self.narrative_transformer.eval()
+
+        else:
+            self.tokenizer = GPT2Tokenizer.from_pretrained(self.planners[planner])
+            self.narrative_transformer = GPT2LMHeadModel.from_pretrained(self.planners[planner])
+            self.narrative_transformer.resize_token_embeddings(len(self.tokenizer))
+            self.narrative_transformer.eval()
 
     def retrieve_prompt(self, script:Script):
         #TODO: Review get_prev_lines because theres a smarter way to so this
@@ -40,9 +49,11 @@ class NarrativePlanner:
         lines = script.get_prev_lines(n=1, type=script.DIRECTION) \
                 + script.get_prev_lines(n=2, type=script.UTTERANCE)
         lines.sort(key=attrgetter('line_num'))
-        prompt = '\n'.join([f'{l.character} : "{l.text}"' if l.type == script.UTTERANCE else l.text for l in lines])
+        # prompt = ' '.join([f'{l.character} : "{l.text}"' if l.type == script.UTTERANCE else l.text for l in lines])
+        prompt = 'Alice is eating the chocolate. Bob watches her with envy. Bob : "Why are you eating chocolate?" Alice : "I like chocolate."'
+
         # return "<|startoftext|> " + prompt
-        return "<|startoftext|>" + prompt
+        return '<|startoftext|>' + prompt
 
 
     # Generate screen direction given past direction and utterences
@@ -70,13 +81,13 @@ if __name__=='__main__':
     arc = [Emotions.SADNESS, Emotions.HAPPINESS]
     s = Script(arc)
     N = 3
-    utterances = ["Why are you eating chocolate?.", "I like chocolate."]
-    directions = ["Character_X is eating the chocolate. Character_Y watches her with envy."]
+    utterances = ["Why are you eating chocolate?", "I like chocolate."]
+    directions = ["<Character_X> is eating the chocolate. Character_Y watches her with envy."]
     print(str(s))
     s.append_direction(directions[0])
     s.append_utterance(utterances[0], s.CHARACTER_Y)
     s.append_utterance(utterances[1], s.CHARACTER_X)
-    NP = NarrativePlanner()
+    NP = NarrativePlanner(planner=Planners.ROCStories__full)
     prompt = NP.retrieve_prompt(s)
     print(f"prompt : \n{prompt}")
     generated = NP.generate_direction(s)
