@@ -50,7 +50,7 @@ class NarrativePlanner:
                 + script.get_prev_lines(n=2, type=script.UTTERANCE)
         lines.sort(key=attrgetter('line_num'))
         # prompt = ' '.join([f'{l.character} : "{l.text}"' if l.type == script.UTTERANCE else l.text for l in lines])
-        prompt = 'Alice is eating the chocolate. Bob watches her with envy. Bob : "Why are you eating chocolate?" Alice : "I like chocolate."'
+        prompt = 'Alice is eating the chocolate. Bob watches her with envy. Bob : "Why are you eating chocolate?" Alice : "I like chocolate." Alice offers Bob a piece. Bob eats it.'
 
         # return "<|startoftext|> " + prompt
         return '<|startoftext|>' + prompt
@@ -87,7 +87,7 @@ if __name__=='__main__':
     s.append_direction(directions[0])
     s.append_utterance(utterances[0], s.CHARACTER_Y)
     s.append_utterance(utterances[1], s.CHARACTER_X)
-    NP = NarrativePlanner(planner=Planners.ROCStories__full)
+    NP = NarrativePlanner(planner=Planners.DEFAULT)
     prompt = NP.retrieve_prompt(s)
     print(f"prompt : \n{prompt}")
     generated = NP.generate_direction(s)
