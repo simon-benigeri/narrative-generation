@@ -15,12 +15,9 @@ class NarrativePlanner:
     def __init__(self, planner: Planners=Planners.DEFAULT):
         # Load transformer
         self.planners = {
-            Planners.DEFAULT: 'gpt2-large',
-            Planners.ROCStories__spring2016: 'gpt2-large__ROCStories__spring2016',
-            Planners.ROCStories__winter2017: 'gpt2-large__ROCStories__winter2017',
+            Planners.DEFAULT: 'gpt2-large'
             # Planners.ROCStories__full: 'gpt2-large__ROCStories__full',
-            Planners.ROCStories__full: '../models/ROCStories_full/model_save',
-            Planners.GLUCOSE: 'gpt2-large__GLUCOSE'
+            Planners.ROCStories__full: '../models/ROCStories_full/model_save'
         }
         # narrative_models_dir = "saved_models/narrative_planner_models/"
         # path = narrative_models_dir + self.planner[planner]
@@ -37,11 +34,13 @@ class NarrativePlanner:
             self.narrative_transformer.resize_token_embeddings(len(self.tokenizer))
             self.narrative_transformer.eval()
 
+        """
         else:
             self.tokenizer = GPT2Tokenizer.from_pretrained(self.planners[planner])
             self.narrative_transformer = GPT2LMHeadModel.from_pretrained(self.planners[planner])
             self.narrative_transformer.resize_token_embeddings(len(self.tokenizer))
             self.narrative_transformer.eval()
+        """
 
     def retrieve_prompt(self, script:Script):
         #TODO: Review get_prev_lines because theres a smarter way to so this
