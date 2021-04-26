@@ -27,6 +27,8 @@ class ContextBuilder:
 
         # Look through frames for emotion matches
         candidate_frames = []
+        character_bindings = []
+
         for frame in frames:
             # NOTE: For now we assume character bindings will be in the order they are in they
             character_bindings = list(zip(characters, frame["characters"]))

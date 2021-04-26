@@ -16,7 +16,6 @@ class NarrativePlanner:
         # Load transformer
         self.planners = {
             Planners.DEFAULT: 'gpt2-large'
-            # Planners.ROCStories__full: 'gpt2-large__ROCStories__full',
             Planners.ROCStories__full: '../models/ROCStories_full/model_save'
         }
         # narrative_models_dir = "saved_models/narrative_planner_models/"
@@ -35,6 +34,7 @@ class NarrativePlanner:
             self.narrative_transformer.eval()
 
         """
+        # using our pretrained model
         else:
             self.tokenizer = GPT2Tokenizer.from_pretrained(self.planners[planner])
             self.narrative_transformer = GPT2LMHeadModel.from_pretrained(self.planners[planner])
