@@ -27,6 +27,8 @@ class ContextBuilder:
 
         # Look through frames for emotion matches
         candidate_frames = []
+        character_bindings = []
+
         for frame in frames:
             # NOTE: For now we assume character bindings will be in the order they are in they
             character_bindings = list(zip(characters, frame["characters"]))
@@ -117,6 +119,8 @@ if __name__=='__main__':
     model_name = "deepset/roberta-base-squad2"
 
     # a) Get predictions
+    """
+    
     nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
     QA_input = {
         'question': 'Where is Bob located?',
@@ -124,6 +128,7 @@ if __name__=='__main__':
     }
     res = nlp(QA_input)
     print(res)
+    """
     """
     
     QA_input = {
@@ -141,28 +146,40 @@ if __name__=='__main__':
     model = AutoModelForQuestionAnswering.from_pretrained(model_name)
     # tokenizer = AutoTokenizer.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
     # model = AutoModelForQuestionAnswering.from_pretrained("bert-large-uncased-whole-word-masking-finetuned-squad")
-    text = r"""
+    old_text = r"""
     🤗 Transformers (formerly known as pytorch-transformers and pytorch-pretrained-bert) provides general-purpose
     architectures (BERT, GPT-2, RoBERTa, XLM, DistilBert, XLNet…) for Natural Language Understanding (NLU) and Natural
     Language Generation (NLG) with over 32+ pretrained models in 100+ languages and deep interoperability between
     TensorFlow 2.0 and PyTorch.
     """
-    questions = [
+    text = r"""
+    Bob is in the kitchen. Bob is in the bedroom.
+    """
+    old_questions = [
         "How many pretrained models are available in 🤗 Transformers?",
         "What does 🤗 Transformers provide?",
         "🤗 Transformers provides interoperability between which frameworks?",
+        "What architectures does hugging face provide?"
+    ]
+    questions = [
+        "Where is Bob?"
     ]
     for question in questions:
         inputs = tokenizer(question, text, add_special_tokens=True, return_tensors="pt")
         input_ids = inputs["input_ids"].tolist()[0]
         outputs = model(**inputs)
+        print(outputs)
         answer_start_scores = outputs.start_logits
         answer_end_scores = outputs.end_logits
         answer_start = torch.argmax(
             answer_start_scores
-        )  # Get the most likely beginning of answer with the argmax of the score
+        )
+        print(answer_start)# Get the most likely beginning of answer with the argmax of the score
         answer_end = torch.argmax(
-            answer_end_scores) + 1  # Get the most likely end of answer with the argmax of the score
+            answer_end_scores) + 1
+        print(answer_end)# Get the most likely end of answer with the argmax of the score
+        words = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(input_ids))
+        print(words)
         answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(input_ids[answer_start:answer_end]))
         print(f"Question: {question}")
         print(f"Answer: {answer}")
