@@ -78,6 +78,7 @@ if __name__=='__main__':
     s.append_utterance(utterances[0], bob)
     s.append_utterance(utterances[1], alice)
     NP = NarrativePlanner(planner=Planners.DEFAULT)
+    # NP = NarrativePlanner(planner=Planners.ROCStories)
     prompt = NP.retrieve_prompt(s)
     print(f"Prompt : \n{prompt}")
     generated = NP.generate_direction(s)
