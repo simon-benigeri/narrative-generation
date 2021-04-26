@@ -55,7 +55,7 @@ class DialogueGenerator:
     def generate_dialogue(self, script:Script, context_text:str, leading_character:Character, response_character:Character) -> str:
 
         # TEMP: Hard code emotion and input lines for now
-        emotion = Emotions.FEAR
+        emotion = leading_character.current_emotion()
 
         # Prompt generator with context text
         prompt = "<|startoftext|>" + context_text + " C: "

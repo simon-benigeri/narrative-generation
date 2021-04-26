@@ -21,7 +21,7 @@ class NarrativeController:
         # Initialize components
         self.narrative_frame_collection = NarrativeFrameCollection()
         self.context_builder = ContextBuilder()
-        # self.dialogue_generator = DialogueGenerator()
+        self.dialogue_generator = DialogueGenerator()
         #self.narrative_planner = NarrativePlanner()
     
     """ Step to next stage of each characters arc """
@@ -46,13 +46,13 @@ class NarrativeController:
             leading_character, response_character = self.select_dialogue_characters()
 
             # Generate dialogue
-            utterances = self.dialogue_generator.generate_dialogue(script=script, context_text=context_text, leading_character=leading_character, response_character=response_character)
+            utterances = self.dialogue_generator.generate_dialogue(script=self.script, context_text=context_text, leading_character=leading_character, response_character=response_character)
             for character, utterance in utterances:
                 self.script.append_utterance(character=character, utterance=utterance)
 
             # Generate screen direction
-            direction = self.narrative_planner.generate_direction(script)
-            self.script.append_direction(direction)
+            #direction = self.narrative_planner.generate_direction(self.script)
+            #self.script.append_direction(direction)
 
             # Step to next stage of the arc
             self.arc_step()

@@ -86,15 +86,19 @@ class Script:
     def save(self, file_path):
         pass
     
+    """ Convert list of lines to string """
+    def lines_to_str(self, lines):
+        lines_str = ""
+        for l in lines:
+            if l.type == self.UTTERANCE:
+                lines_str += f"{l.character} : {l.text}" + "\n"
+            elif l.type == self.DIRECTION:
+                lines_str += f"{l.text}" + "\n"
+        return lines_str
+
     """ Convert script to string """
     def __str__(self):
-        script_str = ""
-        for l in self.script_lines:
-            if l.type == self.UTTERANCE:
-                script_str += f"{l.character} : {l.text}" + "\n"
-            elif l.type == self.DIRECTION:
-                script_str += f"{l.text}" + "\n"
-        return script_str
+        return self.lines_to_str(self.lines)
 
 if __name__ =='__main__':
     arc = [Emotions.SADNESS, Emotions.HAPPINESS]
