@@ -1,59 +1,37 @@
 from collections import namedtuple
 from typing import List, Tuple
 from .Emotions import Emotions
+from .Character import Character
 
 """
 Component to hold the script
 """
 class Script:
     # Named tuple for a single line in the script
-    ScriptLine = namedtuple('ScriptLine', ['line_num', 'arc_stage', 'type', 'character','text'])
+    ScriptLine = namedtuple('ScriptLine', ['line_num', 'arc_stage', 'type', 'character', 'text'])
 
-    def __init__(self, arc: List[Tuple[Emotions]]):
+    def __init__(self):
         self.DIRECTION = 0
         self.UTTERANCE = 1
-        self.CHARACTER_X = 'Character_X'
-        self.CHARACTER_Y = 'Character_Y'
-
-        # Set story arc and current arc stage
-        self.arc = arc
-        self.current_arc_stage = 0
-
-        # Set story complete to false unless arc list is empty
-        self.complete = len(self.arc) == 0
 
         # List of lines in the script
         self.script_lines = []
 
-        # TODO: initial directions?
-    
-    # Increment arc stage
-    def arc_step(self):
-        # Only step if within arc length
-        if self.current_arc_stage < len(self.arc) - 1:
-            self.current_arc_stage += 1
-        
-        # Otherwise, set script to complete
-        else:
-            self.complete = True
-    
-    # Get current stage of arc
-    def get_current_arc_stage(self):
-        return self.arc[self.current_arc_stage]
+        # Flag if script is complete
+        self.is_complete = False
 
-    # Append utterance to script
-    def append_utterance(self, utterance: str, character: str):
+    """ Append utterance to script """
+    def append_utterance(self, utterance: str, character: Character):
         self.script_lines.append(
-            self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.UTTERANCE, character, utterance))
+            self.ScriptLine(len(self.script_lines), character.arc_stage, self.UTTERANCE, character, utterance))
     
-    # Append direction to script
-    def append_direction(self, direction: str, character: str=None):
+    """ Append direction to script """
+    def append_direction(self, direction: str):
         self.script_lines.append(
-            self.ScriptLine(len(self.script_lines), self.current_arc_stage, self.DIRECTION, character, direction))
+            self.ScriptLine(len(self.script_lines), None, self.DIRECTION, None, direction))
 
-    # Get the last n utterances from the script
-    def get_prev_utterances(self, n: int, character: str):
-        # ...
+    """ Get the last n utterances from the script """
+    def get_prev_utterances(self, n: int, character: Character):
         count, index = 0, 0
         prev_utterances = []
         for _ in range(len(self.script_lines)):
@@ -66,9 +44,8 @@ class Script:
                 count += 1
         return prev_utterances
     
-    # Get the last n directions from the script
-    def get_prev_directions(self, n: int, character: str):
-        # ...
+    """ Get the last n directions from the script """
+    def get_prev_directions(self, n: int):
         count, index = 0, 0
         prev_directions = []
         for _ in range(len(self.script_lines)):
@@ -81,8 +58,8 @@ class Script:
                 count += 1
         return prev_directions
 
-    # Get the last n directions from the script
-    def get_prev_lines(self, n: int, type: int, character: str=None):
+    """ Get the last n directions from the script """
+    def get_prev_lines(self, n: int, type: int, character: Character=None):
         """
         returns previous utterances or screen directions for a character
         Args:
@@ -93,7 +70,6 @@ class Script:
         Returns: prev n directions or utterances for a character
 
         """
-        # ...
         count, index = 0, 0
         prev = []
         for _ in range(len(self.script_lines)):
@@ -106,11 +82,11 @@ class Script:
                 count += 1
         return prev
     
-    # Save script to file
+    """ Save script to file """
     def save(self, file_path):
         pass
     
-    # Convert script to string
+    """ Convert script to string """
     def __str__(self):
         script_str = ""
         for l in self.script_lines:

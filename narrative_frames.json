@@ -1,35 +1,47 @@
 [
     {
         "description": "Character_X is looking for Character_Y",
-        "character_x_emotion": ["anger"],
-        "character_y_emotion": ["happy"],
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], ["happy"]],
         "event_attributes": [
             {
-                "event": "Character_X goes to <position/location>.",
+                "attribute": "Character_X goes to <position/location>.",
                 "question": "Where is Character_X going?"
             },
             {
-                "event": "Character_Y is at <position/location>.",
+                "attribute": "Character_Y is at <position/location>.",
                 "question": "Where is Character_Y?"
             }
         ]
     },
 
     {
-        "description": "Character_X confronts Character_Y with violent intentions",
-        "character_x_emotion": ["anger"],
-        "character_y_emotion": ["surprise", "anger", "fear"],
+        "description": "Character_X attacks Character_Y",
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], []],
         "event_attributes": [
             {
-                "event": "Character_X is holding <object>.",
+                "attribute": "Character_X <action> Character_Y",
+                "question": "What does Character_X want to do to Character_Y?"
+            }
+        ]
+    },
+
+    {
+        "description": "Character_X confronts Character_Y with violent intentions",
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], ["surprise", "anger", "fear"]],
+        "event_attributes": [
+            {
+                "attribute": "Character_X is holding <object>.",
                 "question": "What is Character_X holding?"
             },
             {
-                "event": "Character_X is <position/location>.",
+                "attribute": "Character_X is <position/location>.",
                 "question": "Where is Character_X?"
             },
             {
-                "event": "Character_Y is <position/location>.",
+                "attribute": "Character_Y is <position/location>.",
                 "question": "Where is Character_Y?"
             }
         ]
