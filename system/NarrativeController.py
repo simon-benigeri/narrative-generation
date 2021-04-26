@@ -28,27 +28,26 @@ class NarrativeController:
     def arc_step(self):
         for character in self.characters:
             character.arc_step()
-
-    """ Return whether every characters arc is complete """
-    def character_arcs_complete(self):
-        return all([c.arc_complete for c in self.characters])
+    
+    """ Decide on which characters should participate in dialogue and which lead/respond """
+    def select_dialogue_characters(self):
+        # TODO: Need to figure out how to do this or if this is even the way to go
+        # NOTE: First two will always lead
+        return self.characters[0], self.characters[1]
     
     """ Generate narrative script using components """
     def generate_script(self):
         # Generate script until all character arcs are complete TODO: this is a dumb way to loop
-        while not self.character_arcs_complete():
-            # TODO: some issue here wit context text
+        while not self.script.is_complete:
             # Generate context
             context_text = self.context_builder.generate_context(script=self.script, characters=self.characters, narrative_frame_collection=self.narrative_frame_collection)
-            print("Context: ", context_text)
-            return self.script
 
-            # TODO: Need to bind characters for dialogue
+            # Decide on which character leads the dialogue
+            leading_character, response_character = self.select_dialogue_characters()
 
             # Generate dialogue
-            utterances = self.dialogue_generator.generate_dialogue(script=script, context_text=context_text)
+            utterances = self.dialogue_generator.generate_dialogue(script=script, context_text=context_text, leading_character=leading_character, response_character=response_character)
             for character, utterance in utterances:
-                #TODO: not sure if we are appending utterances right here <- what does this mean?
                 self.script.append_utterance(character=character, utterance=utterance)
 
             # Generate screen direction
@@ -57,5 +56,8 @@ class NarrativeController:
 
             # Step to next stage of the arc
             self.arc_step()
+
+            # Decide if story is complete
+            self.script.is_complete = all([c.arc_complete for c in self.characters])
             
         return self.script

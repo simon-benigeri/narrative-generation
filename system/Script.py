@@ -17,6 +17,9 @@ class Script:
         # List of lines in the script
         self.script_lines = []
 
+        # Flag if script is complete
+        self.is_complete = False
+
     """ Append utterance to script """
     def append_utterance(self, utterance: str, character: Character):
         self.script_lines.append(

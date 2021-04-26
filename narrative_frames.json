@@ -1,8 +1,8 @@
 [
     {
         "description": "Character_X is looking for Character_Y",
-        "character_x_emotion": ["anger"],
-        "character_y_emotion": ["happy"],
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], ["happy"]],
         "event_attributes": [
             {
                 "attribute": "Character_X goes to <position/location>.",
@@ -17,8 +17,8 @@
 
     {
         "description": "Character_X attacks Character_Y",
-        "character_x_emotion": ["anger"],
-        "character_y_emotion": [],
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], []],
         "event_attributes": [
             {
                 "attribute": "Character_X <action> Character_Y",
@@ -29,8 +29,8 @@
 
     {
         "description": "Character_X confronts Character_Y with violent intentions",
-        "character_x_emotion": ["anger"],
-        "character_y_emotion": ["surprise", "anger", "fear"],
+        "characters": ["Character_X", "Character_Y"],
+        "character_emotions": [["anger"], ["surprise", "anger", "fear"]],
         "event_attributes": [
             {
                 "attribute": "Character_X is holding <object>.",

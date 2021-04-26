@@ -15,12 +15,6 @@ args = vars(parser.parse_args())
 """
 
 if __name__ =='__main__':
-    # Define arc
-    arc = [
-            (Emotions.ANGER, Emotions.HAPPINESS),
-            (Emotions.ANGER, Emotions.FEAR),
-            (Emotions.HAPPINESS, Emotions.SADNESS),
-        ]
     
     # Define characters
     alice = Character(name="Alice", arc=[Emotions.ANGER, Emotions.ANGER, Emotions.HAPPINESS])
