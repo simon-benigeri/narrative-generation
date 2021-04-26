@@ -98,5 +98,5 @@ class Script:
 
     """ Convert script to string """
     def __str__(self):
-        return self.lines_to_str(self.lines)
+        return self.lines_to_str(self.script_lines)
 
