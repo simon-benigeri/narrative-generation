@@ -17,11 +17,11 @@ args = vars(parser.parse_args())
 if __name__ =='__main__':
     
     # Define characters
-    alice = Character(name="Alice", arc=[Emotions.ANGER, Emotions.ANGER, Emotions.HAPPINESS])
-    bob = Character(name="Bob", arc=[Emotions.HAPPINESS, Emotions.FEAR, Emotions.SADNESS])
+    alice = Character(name="Alice", arc=[Emotions.ANGER, Emotions.ANGER])
+    bob = Character(name="Bob", arc=[Emotions.HAPPINESS, Emotions.FEAR])
     
     # Initialize narrative controller
-    print("Initializing narrative contoller...")
+    print("Initializing narrative controller...")
     narrative_controller = NarrativeController(characters=[alice, bob])
     
     # Define initial script

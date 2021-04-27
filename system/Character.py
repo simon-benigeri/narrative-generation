@@ -19,7 +19,7 @@ class Character:
     
     """ Step to next part of character arc """
     def arc_step(self):
-        if self.arc_stage < len(self.arc):
+        if self.arc_stage < len(self.arc) - 1:
             self.arc_stage += 1
         else:
             self.arc_complete = True

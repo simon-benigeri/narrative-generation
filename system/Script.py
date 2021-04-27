@@ -59,7 +59,7 @@ class Script:
         return prev_directions
 
     """ Get the last n directions from the script """
-    def get_prev_lines(self, n: int, type: int, character: Character=None):
+    def get_prev_lines(self, n: int, type: int=None, character: Character=None):
         """
         returns previous utterances or screen directions for a character
         Args:
@@ -77,7 +77,7 @@ class Script:
                 break
             index -= 1
             line = self.script_lines[index]
-            if line.type == type and (not character or line.character == character):
+            if (not character or line.type == type) and (not character or line.character == character):
                 prev.insert(0, line)
                 count += 1
         return prev

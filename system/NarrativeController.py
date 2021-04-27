@@ -22,7 +22,7 @@ class NarrativeController:
         self.narrative_frame_collection = NarrativeFrameCollection()
         self.context_builder = ContextBuilder()
         self.dialogue_generator = DialogueGenerator()
-        #self.narrative_planner = NarrativePlanner()
+        self.narrative_planner = NarrativePlanner()
     
     """ Step to next stage of each characters arc """
     def arc_step(self):
@@ -37,7 +37,7 @@ class NarrativeController:
     
     """ Generate narrative script using components """
     def generate_script(self):
-        # Generate script until all character arcs are complete TODO: this is a dumb way to loop
+        # Generate script until all character arcs are complete 
         while not self.script.is_complete:
             # Generate context
             context_text = self.context_builder.generate_context(script=self.script, characters=self.characters, narrative_frame_collection=self.narrative_frame_collection)
@@ -51,8 +51,8 @@ class NarrativeController:
                 self.script.append_utterance(character=character, utterance=utterance)
 
             # Generate screen direction
-            #direction = self.narrative_planner.generate_direction(self.script)
-            #self.script.append_direction(direction)
+            direction = self.narrative_planner.generate_direction(self.script)
+            self.script.append_direction(direction)
 
             # Step to next stage of the arc
             self.arc_step()

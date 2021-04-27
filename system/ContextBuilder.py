@@ -27,14 +27,12 @@ class ContextBuilder:
 
         # Look through frames for emotion matches
         candidate_frames = []
-        character_bindings = []
 
         for frame in frames:
-            # NOTE: For now we assume character bindings will be in the order they are in they
+            # NOTE: For now we assume character bindings will be a one-to-one map between characters and frame.characters
             character_bindings = list(zip(characters, frame["characters"]))
 
             # If the number of characters in the frame don't match the characters we have passed in, ignore this frame
-            # NOTE: For now, we always assume two characters
             if len(characters) != len(frame["characters"]):
                 continue
 
@@ -43,11 +41,12 @@ class ContextBuilder:
                 if not characters[0].current_emotion().name.lower() in frame["character_emotions"]:
                     continue
 
-            # If frames were not skipped above, append it as a candidate
-            candidate_frames.append(frame)
+            # If frames were not skipped above, append frame and bindings as a candidate
+            candidate_frames.append((frame, character_bindings))
 
-        # Select one of the candidate frames randomly
-        return random.choice(candidate_frames), character_bindings
+        # Select one of the candidate frames and its bindings randomly
+        random.choice(candidate_frames)
+        return random.choice(candidate_frames)
 
     """ Answer questions from the frame and add fill in event attribute text """
     def contextualize_event_attributes(self, script:Script, character_bindings:List[Tuple], frame:dict) -> List[str]:
