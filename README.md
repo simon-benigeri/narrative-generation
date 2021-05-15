@@ -1,11 +1,5 @@
 # Narrative Generation Proposal
 
-Marko Sterbentz
-
-Cameron Barrie, Harkirat Gill, Simon Benigeri
-
-March 2021
-
 ## Outline
 
 -   Introduction
