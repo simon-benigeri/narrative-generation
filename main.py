@@ -14,7 +14,7 @@ parser.add_argument("--dirY", type=List[str], default=["Character_Y in front of 
 args = vars(parser.parse_args())
 """
 
-if __name__ =='__main__':
+if __name__ == '__main__':
     
     # Define characters
     alice = Character(name="Alice", arc=[Emotions.ANGER, Emotions.ANGER])
