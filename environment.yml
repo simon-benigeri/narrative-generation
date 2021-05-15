@@ -8,6 +8,10 @@ dependencies:
   - python>=3.7,<3.9
   - pytorch
   - transformers
+  - sentencepiece
+  - protobuf
+  - matplotlib
+  - scikit-learn
   - datasets
   - numpy
   - tqdm
