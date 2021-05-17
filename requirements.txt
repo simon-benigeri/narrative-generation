@@ -1,0 +1,8 @@
+sklearn
+pandas
+nltk
+matplotlib
+searborn
+torch
+transformers
+sentencepiece
