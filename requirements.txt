@@ -2,7 +2,7 @@ sklearn
 pandas
 nltk
 matplotlib
-searborn
+seaborn
 torch
 transformers
 sentencepiece
