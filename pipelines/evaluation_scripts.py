@@ -7,12 +7,8 @@ from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2Seq
 EMOTION_SCORE_THRESHOLD = 4
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
 
-tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
-# model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
-model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/t5-base-finetuned-emotion")
 
-
-def evaluate(samples):
+def evaluate(model, samples):
     outputs = np.array([list(_get_emotion(sample)) for sample in samples])
     df = pd.DataFrame(data=outputs,
                       columns = ['target_labels', 'target_confidence', 'predicted_labels', 'predicted_confidence'])
@@ -28,7 +24,7 @@ def evaluate(samples):
     mean_averages = df.groupby('target_labels')['target_confidence'].mean()
     return report, mean_averages
 
-def _get_emotion(text):
+def _get_emotion(model, text):
     texts = text.split('\n')[1].split(':')
     target, response = texts[1].strip(' ()'), texts[2].strip()
 
@@ -45,12 +41,32 @@ def _get_emotion(text):
 
     return (target, target_confidence, predicted, predicted_confidence)
 
+def generate_samples(model, prompt):
+    model.eval()
+    generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
+    generated = generated.to(device)
+
+    sample_outputs = model.generate(
+                                generated, 
+                                #bos_token_id=random.randint(1,30000),
+                                do_sample=True,   
+                                top_k=50, 
+                                max_length = 300,
+                                top_p=0.90, 
+                                num_return_sequences=3
+                            )
+
+    return tokenizer.decode(sample_output, skip_special_tokens=True))
+
 if __name__=='__main__':
-    s = "C: (joy): What did they say?\nR: (sadness): They said I'm a worthless human being."
-    a = "C: (joy): What did they say?\nR: (anger): They said I'm fired."
-    e = "C: (joy): What did they say?\nR: (anger): They said I don't have a reservation."
-    f = "C: (joy): What did they say?\nR: (anger): They said they love me."
-    g = "C: (joy): What did they say?\nR: (anger): They said I'm gonna be rich."
-    test = [s, a, e, f, g]
-    out = evaluate(test)
+    # Load emotion model
+    emotion_tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
+    # emotion_model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
+    emotion_model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/t5-base-finetuned-emotion")
+
+    # Load dialogue model
+    # ...
+
+    #generated = generate_samples(dialogue_model, prompt)
+    out = evaluate(emotion_model, generated)
     print(out)

@@ -60,7 +60,7 @@ def get_formatted_script_scenes(scripts_dir, max=0):
         if max_scripts > 0 and i >= max_scripts:
             break
 
-        with open(scripts_dir + filename) as f:
+        with open(os.path.join(scripts_dir, filename)) as f:
             script_scenes = "\n".join(f.readlines()).split("<new-scene>")
             for s in script_scenes:
                 script_lines = s.split("\n")
@@ -79,7 +79,7 @@ def get_formatted_call_responses(scripts_dir, max_scripts=0):
         if max_scripts > 0 and i >= max_scripts:
             break
 
-        with open(scripts_dir + filename) as f:
+        with open(os.path.join(scripts_dir, filename)) as f:
             lines += "".join(f.readlines()).split("---")
     return lines
 
@@ -223,7 +223,7 @@ def plot_training_stats(training_stats):
     plt.show()
 
 """ Generate some sample outputs from the transformer """
-def generate_samples(prompt):
+def generate_samples(model, prompt):
     model.eval()
     generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
     generated = generated.to(device)
@@ -238,11 +238,10 @@ def generate_samples(prompt):
                                 num_return_sequences=3
                             )
 
-    for i, sample_output in enumerate(sample_outputs):
-        print("{}:\n{}\n\n".format(i, tokenizer.decode(sample_output, skip_special_tokens=True)))
+    return tokenizer.decode(sample_output, skip_special_tokens=True))
 
 """ Save model """
-def save_model(output_dir):
+def save_model(model, output_dir):
     # Create output directory if needed
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -310,4 +309,4 @@ if __name__ == "__main__":
     plot_training_stats(training_stats)
 
     # Save model
-    save_model(SAVE_MODEL_DIR)
+    save_model(model, SAVE_MODEL_DIR)
