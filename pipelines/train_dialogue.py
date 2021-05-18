@@ -22,8 +22,8 @@ nltk.download('punkt')
 
 # Config
 GPT_MODEL = 'gpt2'
-READ_SCRIPTS_DIR = 'data/temp/'
-SAVE_MODEL_DIR = 'models/dialogue_temp'
+READ_SCRIPTS_DIR = 'temp-data'
+SAVE_MODEL_DIR = 'models/temp'
 
 BATCH_SIZE = 2
 EPOCHS = 1
@@ -308,3 +308,6 @@ if __name__ == "__main__":
     # Print training stats
     print("Training stats...")
     plot_training_stats(training_stats)
+
+    # Save model
+    save_model(SAVE_MODEL_DIR)
