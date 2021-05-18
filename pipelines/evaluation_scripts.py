@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 import torch
 from sklearn.metrics import classification_report
-from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM
+from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM, GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
 
 EMOTION_SCORE_THRESHOLD = 4
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
-
+LOAD_DIALOGUE_MODEL_DIR = "models/temp"
 
 def evaluate(model, samples):
-    outputs = np.array([list(_get_emotion(sample)) for sample in samples])
+    outputs = np.array([list(_get_emotion(model, sample)) for sample in samples])
     df = pd.DataFrame(data=outputs,
                       columns = ['target_labels', 'target_confidence', 'predicted_labels', 'predicted_confidence'])
     df = df.astype({'target_labels': 'str',
@@ -41,10 +41,10 @@ def _get_emotion(model, text):
 
     return (target, target_confidence, predicted, predicted_confidence)
 
-def generate_samples(model, prompt):
+def generate_samples(model, prompt, num_generations=1):
     model.eval()
     generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
-    generated = generated.to(device)
+    generated = generated.to(model.device)
 
     sample_outputs = model.generate(
                                 generated, 
@@ -53,20 +53,31 @@ def generate_samples(model, prompt):
                                 top_k=50, 
                                 max_length = 300,
                                 top_p=0.90, 
-                                num_return_sequences=3
+                                num_return_sequences=num_generations
                             )
 
-    return tokenizer.decode(sample_output, skip_special_tokens=True))
+    return [tokenizer.decode(sample_output, skip_special_tokens=True) for sample_output in sample_outputs]
 
 if __name__=='__main__':
+    print("Loading models...")
     # Load emotion model
     emotion_tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
     # emotion_model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
     emotion_model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/t5-base-finetuned-emotion")
 
     # Load dialogue model
-    # ...
+    tokenizer = GPT2Tokenizer.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, bos_token='<|startoftext|>', eos_token='<|endoftext|>', pad_token='<|pad|>')
+    configuration = GPT2Config.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, output_hidden_states=False)
+    dialogue_model = GPT2LMHeadModel.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, config=configuration)
+    dialogue_model.resize_token_embeddings(len(tokenizer))
+    dialogue_model.eval()
 
-    #generated = generate_samples(dialogue_model, prompt)
+    print("Evaluating...")
+    generated = generate_samples(dialogue_model, "C: (neutral): Yo jim you got a minute?\nR: (fear):")
+    
+    for g in generated:
+        print(g)
+        print()
+
     out = evaluate(emotion_model, generated)
     print(out)

@@ -226,7 +226,7 @@ def plot_training_stats(training_stats):
 def generate_samples(model, prompt):
     model.eval()
     generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
-    generated = generated.to(device)
+    generated = generated.to(model.device)
 
     sample_outputs = model.generate(
                                 generated, 
@@ -238,7 +238,7 @@ def generate_samples(model, prompt):
                                 num_return_sequences=3
                             )
 
-    return tokenizer.decode(sample_output, skip_special_tokens=True))
+    return [tokenizer.decode(sample_output, skip_special_tokens=True) for sample_output in sample_outputs]
 
 """ Save model """
 def save_model(model, output_dir):
