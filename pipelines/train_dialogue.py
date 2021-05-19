@@ -20,13 +20,9 @@ from transformers import AdamW, get_linear_schedule_with_warmup
 import nltk
 nltk.download('punkt')
 
-# Config
-GPT_MODEL = 'gpt2'
-READ_SCRIPTS_DIR = 'temp-data'
-SAVE_MODEL_DIR = 'models/temp'
 
-BATCH_SIZE = 2
-EPOCHS = 1
+BATCH_SIZE = 4
+EPOCHS = 10
 LEARNING_RATE = 2e-5
 WARMUP_STEPS = 1e2
 EPSILON = 1e-8
@@ -34,6 +30,13 @@ EPSILON = 1e-8
 SAMPLE_EVERY = 0
 
 SEED = 37
+
+# Config
+GPT_MODEL = 'gpt2-medium'
+GENRE = 'Action'
+EMOTIONS = 'emotions'
+READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{GENRE}'
+SAVE_MODEL_DIR = f'models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
 
 """ Prepare Dataset for GPT2 """
 class GPT2Dataset(Dataset):
@@ -218,7 +221,7 @@ def plot_training_stats(training_stats):
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend()
-    plt.xticks(range(1, 5))
+    plt.xticks(range(1, EPOCHS))
 
     plt.show()
 
