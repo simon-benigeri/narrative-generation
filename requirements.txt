@@ -3,7 +3,7 @@ pandas
 nltk
 matplotlib
 seaborn
-pytorch
+torch
 numpy
 tqdm
 transformers
