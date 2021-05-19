@@ -7,6 +7,8 @@ from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2Seq
 EMOTION_SCORE_THRESHOLD = 4
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
 LOAD_DIALOGUE_MODEL_DIR = "models/temp"
+NUM_GENERATIONS = 10
+NUM_SAMPLES = 3
 
 def evaluate(model, samples):
     outputs = np.array([list(_get_emotion(model, sample)) for sample in samples])
@@ -41,7 +43,7 @@ def _get_emotion(model, text):
 
     return (target, target_confidence, predicted, predicted_confidence)
 
-def generate_samples(model, prompt, num_generations=1):
+def generate_samples(model, prompt, num_samples=1):
     model.eval()
     generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
     generated = generated.to(model.device)
@@ -53,7 +55,7 @@ def generate_samples(model, prompt, num_generations=1):
                                 top_k=50, 
                                 max_length = 300,
                                 top_p=0.90, 
-                                num_return_sequences=num_generations
+                                num_return_sequences=num_samples
                             )
 
     return [tokenizer.decode(sample_output, skip_special_tokens=True) for sample_output in sample_outputs]
@@ -73,11 +75,11 @@ if __name__=='__main__':
     dialogue_model.eval()
 
     print("Evaluating...")
-    generated = generate_samples(dialogue_model, "C: (neutral): Yo jim you got a minute?\nR: (fear):")
+    generated = generate_samples(dialogue_model, "C: (neutral): Yo jim you got a minute?\nR: (fear):", num_samples=NUM_SAMPLES)
     
     for g in generated:
         print(g)
         print()
 
-    out = evaluate(emotion_model, generated)
-    print(out)
+    report, mean_averages = evaluate(emotion_model, generated)
+    print(report)

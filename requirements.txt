@@ -6,3 +6,4 @@ seaborn
 torch
 transformers
 sentencepiece
+protobuf
