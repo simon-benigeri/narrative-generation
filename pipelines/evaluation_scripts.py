@@ -6,9 +6,9 @@ from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2Seq
 
 EMOTION_SCORE_THRESHOLD = 4
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
-LOAD_DIALOGUE_MODEL_DIR = "models/temp"
-NUM_GENERATIONS = 10
-NUM_SAMPLES = 3
+LOAD_DIALOGUE_MODEL_DIR = os.environ.get('LOAD_DIALOGUE_MODEL_DIR', 'models/temp')
+NUM_GENERATIONS = int(os.environ.get('NUM_GENERATIONS', 3))
+NUM_SAMPLES = int(os.environ.get('NUM_SAMPLES', 1))
 
 def evaluate(model, samples):
     outputs = np.array([list(_get_emotion(model, sample)) for sample in samples])

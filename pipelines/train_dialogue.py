@@ -21,20 +21,23 @@ import nltk
 nltk.download('punkt')
 
 
-BATCH_SIZE = 4
-EPOCHS = 10
+# Config
+GPT_MODEL = os.environ.get('GPT_MODEL', 'gpt2')
+
+BATCH_SIZE = int(os.environ.get('BATCH_SIZE', 2))
+EPOCHS = int(os.environ.get('EPOCHS', 1))
 LEARNING_RATE = 2e-5
 WARMUP_STEPS = 1e2
 EPSILON = 1e-8
+NUM_TRAIN_SCRIPTS = int(os.environ.get('NUM_TRAIN_SCRIPTS', 0)) # 0 means read all
 
 SAMPLE_EVERY = 0
 
 SEED = 37
 
 # Config
-GPT_MODEL = 'gpt2-medium'
-GENRE = 'Action'
-EMOTIONS = 'emotions'
+GENRE = os.environ.get('GENRE', 'Action')
+EMOTIONS = 'emotions' if os.environ.get('EMOTION', True) else 'no_emotions'
 READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{GENRE}'
 SAVE_MODEL_DIR = f'models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
 
@@ -57,10 +60,10 @@ class GPT2Dataset(Dataset):
         return self.input_ids[idx], self.attn_masks[idx]
 
 """ Get list of scenes formatted for training """
-def get_formatted_script_scenes(scripts_dir, max=0):
+def get_formatted_script_scenes(scripts_dir, num_scripts=0):
     scenes = []
     for i, filename in enumerate(os.listdir(scripts_dir)):
-        if max_scripts > 0 and i >= max_scripts:
+        if num_scripts > 0 and i > num_scripts:
             break
 
         with open(os.path.join(scripts_dir, filename)) as f:
@@ -76,10 +79,10 @@ def get_formatted_script_scenes(scripts_dir, max=0):
     return scenes
 
 """ Get list of formatted call/responses for training """
-def get_formatted_call_responses(scripts_dir, max_scripts=0):
+def get_formatted_call_responses(scripts_dir, num_scripts=0):
     lines = []
     for i, filename in enumerate(os.listdir(scripts_dir)):
-        if max_scripts > 0 and i >= max_scripts:
+        if num_scripts > 0 and i >= num_scripts:
             break
 
         with open(os.path.join(scripts_dir, filename)) as f:
@@ -267,7 +270,7 @@ if __name__ == "__main__":
 
     # Inititalize dataset
     print("Preparing data...")
-    lines = get_formatted_call_responses(READ_SCRIPTS_DIR)
+    lines = get_formatted_call_responses(READ_SCRIPTS_DIR, NUM_TRAIN_SCRIPTS)
     dataset = GPT2Dataset(lines, tokenizer, max_length=256)
 
     # Split into training and validation sets
