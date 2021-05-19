@@ -1,9 +1,13 @@
-sklearn
+scikit-learn
 pandas
 nltk
 matplotlib
 seaborn
-torch
+pytorch
+numpy
+tqdm
 transformers
+datasets
 sentencepiece
 protobuf
+pandas
