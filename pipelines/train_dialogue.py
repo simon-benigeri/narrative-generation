@@ -38,7 +38,8 @@ SEED = 37
 # Config
 GENRE = os.environ.get('GENRE', 'Action')
 EMOTIONS = os.environ.get('EMOTIONS', 'emotions')
-READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{GENRE}'
+genre_extension = f'{GENRE}/' if EMOTIONS in ['emotions', 'no_emotions'] else ''
+READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{genre_extension}'
 SAVE_MODEL_DIR = f'../models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
 
 """ Prepare Dataset for GPT2 """
@@ -225,7 +226,7 @@ def plot_training_stats(training_stats):
     plt.ylabel("Loss")
     plt.legend()
     plt.xticks(range(1, EPOCHS))
-
+    plt.savefig(f"{SAVE_MODEL_DIR}/train.png")
     plt.show()
 
 """ Generate some sample outputs from the transformer """
