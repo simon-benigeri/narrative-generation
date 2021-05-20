@@ -8,6 +8,7 @@ from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2Seq
 
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
 LOAD_DIALOGUE_MODEL_DIR = os.environ.get('LOAD_DIALOGUE_MODEL_DIR', 'models/temp')
+THRESHOLD = float(os.environ.get('THRESHOLD', 0.7))
 NUM_GENERATIONS = int(os.environ.get('NUM_GENERATIONS', 3))
 NUM_SAMPLES = int(os.environ.get('NUM_SAMPLES', 1))
 
@@ -41,9 +42,9 @@ def _get_emotion(model, text):
       scores = [output.scores[0][0][tokenizer.encode(emotion)[0]].item() for emotion in EMOTIONS]
       scores = list(map(float, list(torch.nn.functional.softmax(torch.tensor(scores), dim=0).detach().numpy())))
 
-      predicted = EMOTIONS[scores.index(max(scores))]
+      predicted = EMOTIONS[scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
       target_confidence = scores[EMOTIONS.index(target)]
-      predicted_confidence = max(scores)
+      predicted_confidence = max(scores) if max(scores) > THRESHOLD else 1 - max(scores)
     except:
       print('error with : ', response)
       predicted = None
