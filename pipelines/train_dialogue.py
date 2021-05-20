@@ -37,7 +37,7 @@ SEED = 37
 
 # Config
 GENRE = os.environ.get('GENRE', 'Action')
-EMOTIONS = os.environ.get('EMOTION', 'emotions')
+EMOTIONS = os.environ.get('EMOTIONS', 'emotions')
 READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{GENRE}'
 SAVE_MODEL_DIR = f'../models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
 
