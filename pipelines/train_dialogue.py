@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
     # Print training stats
     print("Training stats...")
-    plot_training_stats(training_stats)
-
+    
     # Save model
     save_model(model, SAVE_MODEL_DIR)
+    plot_training_stats(training_stats)
