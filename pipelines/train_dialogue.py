@@ -226,7 +226,7 @@ def plot_training_stats(training_stats):
     plt.ylabel("Loss")
     plt.legend()
     plt.xticks(range(1, EPOCHS))
-    plt.savefig(f"{SAVE_MODEL_DIR}/train.png")
+    plt.savefig(f"{SAVE_MODEL_DIR}train.png")
     plt.show()
 
 """ Generate some sample outputs from the transformer """
