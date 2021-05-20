@@ -225,7 +225,7 @@ def plot_training_stats(training_stats):
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend()
-    plt.xticks(range(1, EPOCHS))
+    plt.xticks(range(1, EPOCHS+1))
     plt.savefig(f"{SAVE_MODEL_DIR}train.png")
     plt.show()
 
