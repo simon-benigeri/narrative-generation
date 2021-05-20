@@ -1,10 +1,10 @@
+import os
 import numpy as np
 import pandas as pd
 import torch
 from sklearn.metrics import classification_report
 from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM, GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
 
-EMOTION_SCORE_THRESHOLD = 4
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
 LOAD_DIALOGUE_MODEL_DIR = os.environ.get('LOAD_DIALOGUE_MODEL_DIR', 'models/temp')
 NUM_GENERATIONS = int(os.environ.get('NUM_GENERATIONS', 3))
@@ -19,6 +19,8 @@ def evaluate(model, samples):
                     'predicted_labels': 'str',
                     'predicted_confidence': 'float'
                     })
+    # errors_df = df[df[predicted_labels].isna()]               
+    df = df.dropna()
     y_true = df['target_labels'].to_numpy()
     y_pred = df['predicted_labels'].to_numpy()
 
@@ -31,15 +33,21 @@ def _get_emotion(model, text):
     target, response = texts[1].strip(' ()'), texts[2].strip()
 
     input_ids = tokenizer.encode(response + '</s>', return_tensors='pt')
-    output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True,  output_scores=True)
+    try:
+      output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True,  output_scores=True)
 
-    # Get emotion label scores
-    scores = [output.scores[0][0][tokenizer.encode(emotion)[0]].item() for emotion in EMOTIONS]
-    scores = list(map(float, list(torch.nn.functional.softmax(torch.tensor(scores), dim=0).detach().numpy())))
+      # Get emotion label scores
+      scores = [output.scores[0][0][tokenizer.encode(emotion)[0]].item() for emotion in EMOTIONS]
+      scores = list(map(float, list(torch.nn.functional.softmax(torch.tensor(scores), dim=0).detach().numpy())))
 
-    predicted = EMOTIONS[scores.index(max(scores))]
-    target_confidence = scores[EMOTIONS.index(target)]
-    predicted_confidence = max(scores)
+      predicted = EMOTIONS[scores.index(max(scores))]
+      target_confidence = scores[EMOTIONS.index(target)]
+      predicted_confidence = max(scores)
+    except:
+      print('error with : ', response)
+      predicted = None
+      target_confidence = None
+      predicted_confidence = None
 
     return (target, target_confidence, predicted, predicted_confidence)
 
@@ -62,12 +70,16 @@ def generate_samples(model, prompt, num_samples=1):
 
 if __name__=='__main__':
     print("Loading models...")
+    print("Loading T5 emotion tagger...")
     # Load emotion model
     emotion_tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
     # emotion_model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
     emotion_model = AutoModelForSeq2SeqLM.from_pretrained("mrm8488/t5-base-finetuned-emotion")
-
+    emotion_model.resize_token_embeddings(len(emotion_tokenizer))
+    emotion_model.eval()
+    
     # Load dialogue model
+    print("Loading GPT2 dialogue...")
     tokenizer = GPT2Tokenizer.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, bos_token='<|startoftext|>', eos_token='<|endoftext|>', pad_token='<|pad|>')
     configuration = GPT2Config.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, output_hidden_states=False)
     dialogue_model = GPT2LMHeadModel.from_pretrained(LOAD_DIALOGUE_MODEL_DIR, config=configuration)
@@ -75,7 +87,7 @@ if __name__=='__main__':
     dialogue_model.eval()
 
     print("Evaluating...")
-    generated = generate_samples(dialogue_model, "C: (neutral): Yo jim you got a minute?\nR: (fear):", num_samples=NUM_SAMPLES)
+    generated = generate_samples(dialogue_model, "C: (neutral): What's wrong Jim?\nR: (fear):", num_samples=NUM_SAMPLES)
     
     for g in generated:
         print(g)
