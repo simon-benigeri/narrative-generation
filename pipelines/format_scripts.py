@@ -23,21 +23,28 @@ def get_emotion(emotion_dict, threshold=EMOTION_THRESHOLD):
   return "neutral"
 
 # Format call response
-def format_call_response(script_dict, include_character=True, include_emotion=True):
+def format_call_response(script_dict, include_character=True, include_emotion=True, allowed_response_emotion=""):
     call_responses = []
     for scene in script_dict["scenes"]:
         for i, line in enumerate(scene["lines"]):
             formatted_call_response = ""
             if line["type"] == "utterance" and i < len(scene["lines"]) - 1 and scene["lines"][i+1]["type"] == "utterance":
+                call_emotion = get_emotion(line['emotion'], threshold=EMOTION_THRESHOLD)
+                response_emotion = get_emotion(scene['lines'][i+1]['emotion'], threshold=EMOTION_THRESHOLD)
+
+                # Skip line if not required emotion
+                if allowed_response_emotion != "" and response_emotion != allowed_response_emotion:
+                    break
+
                 # Call
                 call_character = f"{line['character']}: " if include_character else "C: "
-                call_emotion = f"({get_emotion(line['emotion'], threshold=EMOTION_THRESHOLD)}): " if include_emotion else ""
-                formatted_call_response += f"{call_character}{call_emotion}{line['text']}\n"
+                call_emotion_formatted = f"({call_emotion}): " if include_emotion else ""
+                formatted_call_response += f"{call_character}{call_emotion_formatted}{line['text']}\n"
 
                 # Response
                 response_character = f"{scene['lines'][i+1]['character']}: " if include_character else "R: "
-                response_emotion = f"({get_emotion(scene['lines'][i+1]['emotion'], threshold=EMOTION_THRESHOLD)}): " if include_emotion else ""
-                formatted_call_response += f"{response_character}{response_emotion}{scene['lines'][i+1]['text']}\n"
+                response_emotion_formatted = f"({response_emotion}): " if include_emotion else ""
+                formatted_call_response += f"{response_character}{response_emotion_formatted}{scene['lines'][i+1]['text']}\n"
 
                 call_responses.append(formatted_call_response)
     
@@ -97,7 +104,7 @@ def save_formatted_script(dir, filename, formatted_script):
     with open(os.path.join(dir, filename), 'w') as f:
         f.write(formatted_script)
 
-def format_scripts(load_dir, save_dir, format_type="whole_script", include_character=True, include_emotion=True):
+def format_scripts(load_dir, save_dir, format_type="whole_script", include_character=True, include_emotion=True, allowed_response_emotion=""):
     # Create save directory if it doesn't exist
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -117,14 +124,14 @@ def format_scripts(load_dir, save_dir, format_type="whole_script", include_chara
             if format_type == "whole_script":
                 formatted_script = format_script(script_dict, include_emotion=include_emotion)
             elif format_type == "call_response":
-                formatted_script = format_call_response(script_dict, include_character=include_character, include_emotion=include_emotion)
+                formatted_script = format_call_response(script_dict, include_character=include_character, include_emotion=include_emotion, allowed_response_emotion=allowed_response_emotion)
 
             # Save script
             save_formatted_script(save_dir, file.split(".")[0], formatted_script)
     print("Done")
 
 if __name__ == '__main__':
-    format_scripts(JSON_SCRIPTS_DIR, FORMATTED_SCRIPTS_DIR, format_type="call_response", include_character=False, include_emotion=True)
+    format_scripts(JSON_SCRIPTS_DIR, FORMATTED_CALL_RESPONSE_DIR + "/sadness", format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion="sadness")
 
     """
     with open(os.path.join(JSON_SCRIPTS_DIR, "kungfupanda.json"), 'r') as f:
