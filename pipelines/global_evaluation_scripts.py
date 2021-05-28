@@ -7,11 +7,15 @@ from sklearn.metrics import classification_report
 GPT_MODEL = os.environ.get('GPT_MODEL', 'gpt2')
 EPOCHS = int(os.environ.get('EPOCHS', 10))
 EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
+GENRE = os.environ.get('GENRE', '')
 
 CSV_RESULTS_DIR = 'results/emotion_labels.csv'
-PATHS = [f'../models/{GPT_MODEL}/{emotion}/{EPOCHS}_epochs/{CSV_RESULTS_DIR}' for emotion in EMOTIONS]
-
-SAVE_RESULTS_DIR = os.environ.get('SAVE_RESULTS_DIR', f'models/{GPT_MODEL}/results')
+if GENRE:
+    PATHS = [f'../models/{GPT_MODEL}/{emotion}/{GENRE}/{EPOCHS}_epochs/{CSV_RESULTS_DIR}' for emotion in EMOTIONS]
+    SAVE_RESULTS_DIR = os.environ.get('SAVE_RESULTS_DIR', f'../models/{GPT_MODEL}/{EPOCHS}_epochs/results/{GENRE}')
+else:
+    PATHS = [f'../models/{GPT_MODEL}/{emotion}/{EPOCHS}_epochs/{CSV_RESULTS_DIR}' for emotion in EMOTIONS]
+    SAVE_RESULTS_DIR = os.environ.get('SAVE_RESULTS_DIR', f'../models/{GPT_MODEL}/{EPOCHS}_epochs/results')
 
 def evaluate(filepaths):
     
@@ -32,16 +36,15 @@ def evaluate(filepaths):
     return report, mean_averages, y_pred
 
 if __name__=='__main__':
-	
-	print("Evaluating...")
-	report, _, _ = evaluate(filepaths=PATHS)
-	formatted_results = f"RESULTS\n{report}"
+    print("Evaluating...")
+    report, _, _ = evaluate(filepaths=PATHS)
+    formatted_results = f"RESULTS\n{report}"
 
-	if not os.path.exists(SAVE_RESULTS_DIR):
+    if not os.path.exists(SAVE_RESULTS_DIR):
         os.makedirs(SAVE_RESULTS_DIR)
-        
+
     with open(SAVE_RESULTS_DIR + "/results.txt", "w") as f:
         f.write(formatted_results)
 
     print("Done.")
-	
+    
