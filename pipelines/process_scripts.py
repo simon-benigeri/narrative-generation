@@ -8,28 +8,49 @@ import re
 import torch
 from transformers import AutoTokenizer, AutoModelWithLMHead
 
-RAW_SCRIPTS_DIR = "data/raw/ScreenPyOutput"
-PROCESSED_SCRIPTS_DIR = "data/processed/json"
+RAW_SCRIPTS_DIR = os.environ.get('RAW_SCRIPTS_DIR', "data/raw/ScreenPyOutput")
+PROCESSED_SCRIPTS_DIR = os.environ.get('PROCESSED_SCRIPTS_DIR', "data/processed/json")
+PROCESS_GENRES = os.environ.get('PROCESS_GENRES', "Action").split(" ") # Genres to process (seperated by a space)
+MAX_SCRIPTS_PROCESS = int(os.environ.get('MAX_SCRIPTS_PROCESS', "0"))
 EMOTION_SCORE_THRESHOLD = 4
 
-def get_emotion(text):
+# https://www.calmsage.com/understanding-the-emotion-wheel/
+
+EMOTIONS_6 = ["joy", "love", "anger", "fear", "sadness", "surprise"]
+
+EMOTIONS_PLUTCHIK_42 = [
+  # Happy
+  "playful", "content", "interested", "proud", "accepted", "powerful", "peaceful", "trusting", "optimistic",
+  # Sad
+  "lonely", "vulnerable", "despair", "guilty", "depressed", "hurt",
+  # Disgusted
+  "repelled", "awful", "disappointed", "disapproving",
+  # Angry
+  "critical", "distant", "frustrated", "aggressive", "mad", "bitter", "humiliated", "disillusioned",
+  # Fearful
+  "threatened", "rejected", "weak", "insecure", "anxious", "scared",
+  # Bad
+  "bored", "busy", "stressed", "tired",
+  # Surprised
+  "startled", "confused", "amazed", "excited"
+]
+
+EMOTIONS_PLUTCHIK_84 = [
+  # "betrayed", "resentful", "disrespected", "ridiculed", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed", "withdrawn", "numb", "skeptical", "dismissive",
+]
+
+def get_emotion(text, emotions=EMOTIONS_6):
     input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
     output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True,  output_scores=True)
 
     # Get emotion label scores
-    emotions = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
     emotion_scores = [
-        output.scores[0][0][tokenizer.encode('joy')[0]].item(),
-        output.scores[0][0][tokenizer.encode('love')[0]].item(),
-        output.scores[0][0][tokenizer.encode('fear')[0]].item(),
-        output.scores[0][0][tokenizer.encode('sadness')[0]].item(),
-        output.scores[0][0][tokenizer.encode('anger')[0]].item(),
-        output.scores[0][0][tokenizer.encode('surprise')[0]].item()
+        output.scores[0][0][tokenizer.encode(e)[0]].item() for e in emotions
     ]
 
     dec = [tokenizer.decode(ids) for ids in output.sequences]
-    label = re.sub(r'\<[^)]*\>', '', dec[0]).strip()
-    return dict(zip(emotions, list(map(float,list(torch.nn.functional.softmax(torch.tensor(emotion_scores), dim=0).detach().numpy())))))
+
+    return dict(zip(emotions, list(map(float, emotion_scores))))
 
 def process_screenpy_script(script_dict, title, genre):
     # Process and append each stage direction and utterance in each scene into a new script
@@ -112,6 +133,10 @@ def is_screenpy_script_valid(script_dict):
 def save_script_dict(dir, filename, script_dict):
     if not ".json" in filename:
         filename += ".json"
+    
+    # Create output directory if needed
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
     with open(os.path.join(dir, filename), 'w') as f:
         json.dump(script_dict, f)
@@ -138,8 +163,9 @@ def process_screenpy_scripts(load_dir, save_dir, process_genres=[]):
                 print("Script has already been processed. Skipping...")
                 continue
 
-            # Stop early for testing
-            if num_processed == 2:
+            # Cap number of scripts to process
+            if MAX_SCRIPTS_PROCESS > 0 and num_processed >= MAX_SCRIPTS_PROCESS:
+                print("Done. Stopping processing at {} scripts.".format(MAX_SCRIPTS_PROCESS))
                 return
 
             # Read all script json
@@ -163,12 +189,14 @@ def process_screenpy_scripts(load_dir, save_dir, process_genres=[]):
 
 if __name__ == '__main__':
     # Load models to label emotions
-    #global tokenizer
-    #global model
-    #tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
-    #model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
+    global tokenizer
+    global model
+    tokenizer = AutoTokenizer.from_pretrained("mrm8488/t5-base-finetuned-emotion")
+    model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
 
-    #process_screenpy_scripts(RAW_SCRIPTS_DIR, PROCESSED_SCRIPTS_DIR, process_genres=["Action"])
+    process_screenpy_scripts(RAW_SCRIPTS_DIR, PROCESSED_SCRIPTS_DIR, process_genres=PROCESS_GENRES)
+    
+    """
     with open(os.path.join(RAW_SCRIPTS_DIR + "/Action/avatar.json"), 'r') as f:
         script_dict = json.load(f)
     
@@ -177,6 +205,7 @@ if __name__ == '__main__':
     for s in sd["scenes"]:
         for l in s["lines"]:
             print(l)
+    """
 
     
 

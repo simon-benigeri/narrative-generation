@@ -4,23 +4,31 @@ Load up processed scrips and format data for training
 import os
 import re
 import json
+import numpy as np
 
 EMOTION_THRESHOLD = 0.7
-JSON_SCRIPTS_DIR = "data/processed/json/Action"
-FORMATTED_SCRIPTS_DIR = "data/processed/formatted/scripts/Action"
-FORMATTED_CALL_RESPONSE_DIR = "data/processed/formatted/call_responses/Action"
+
+JSON_SCRIPTS_DIR = os.environ.get('JSON_SCRIPTS_DIR', "data/processed/json/Action")
+FORMATTED_SCRIPTS_DIR = os.environ.get('FORMATTED_SCRIPTS_DIR', "data/processed/formatted/scripts/Action")
+FORMATTED_CALL_RESPONSE_DIR = os.environ.get('FORMATTED_CALL_RESPONSE_DIR', "data/processed/formatted/call_responses/Action")
 
 START_LINE_TAG = "<start-line>"
 END_LINE_TAG = "<end-line>\n"
 
 NEW_CALL_RESPONSE_TAG = "---\n"
 
+# Softmax emotion dict if currently in score values
+def softmax_emotions(emotion_dict):
+    scores = np.array(list(emotion_dict.values()))
+    probs = np.exp(scores) / np.sum(np.exp(scores))
+    return dict(zip(list(emotion_dict.keys()), probs.tolist()))
+
 # Get emotion from emotion dict
 def get_emotion(emotion_dict, threshold=EMOTION_THRESHOLD):
-  scores=list(emotion_dict.values())
-  if max(scores)>threshold:
-    return list(emotion_dict.keys())[scores.index(max(scores))]
-  return "neutral"
+    scores=list(emotion_dict.values())
+    if max(scores)>threshold:
+        return list(emotion_dict.keys())[scores.index(max(scores))]
+    return "neutral"
 
 # Format call response
 def format_call_response(script_dict, include_character=True, include_emotion=True, allowed_response_emotion=""):
@@ -131,7 +139,19 @@ def format_scripts(load_dir, save_dir, format_type="whole_script", include_chara
     print("Done")
 
 if __name__ == '__main__':
-    format_scripts(JSON_SCRIPTS_DIR, FORMATTED_CALL_RESPONSE_DIR + "/sadness", format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion="sadness")
+    emotions = ["joy", "sadness", "anger", "fear", "surprise", "love"]
+    genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short", "Sport", "Thriller", "War", "Western"]
+    for g in genres:
+      print("Formatting ", g)
+      for e in emotions:
+          print("Formatting ", e)
+
+          if g == "Action":
+              print("Action format won't work")
+          else:
+              format_scripts(JSON_SCRIPTS_DIR + "/" + g, FORMATTED_CALL_RESPONSE_DIR + "/" + g + "/" + e, format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion=e)
+          
+              
 
     """
     with open(os.path.join(JSON_SCRIPTS_DIR, "kungfupanda.json"), 'r') as f:

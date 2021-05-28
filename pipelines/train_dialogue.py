@@ -38,9 +38,15 @@ SEED = 37
 # Config
 GENRE = os.environ.get('GENRE', 'Action')
 EMOTIONS = os.environ.get('EMOTIONS', 'emotions')
+
 genre_extension = f'{GENRE}/' if EMOTIONS in ['emotions', 'no_emotions'] else ''
-READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{genre_extension}'
-SAVE_MODEL_DIR = f'../models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
+#READ_SCRIPTS_DIR = f'../data/processed/formatted/{EMOTIONS}/{genre_extension}'
+#SAVE_MODEL_DIR = f'../models/{GPT_MODEL}/{EMOTIONS}/{GENRE}/{EPOCHS}_epochs/model_save/'
+
+READ_SCRIPTS_BASE_DIR = "../data/processed/formatted/call_responses"
+SAVE_MODEL_DIR = f'../models/{GPT_MODEL}/{EMOTIONS}/{EPOCHS}_epochs/model_save/'
+
+GENRES = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short", "Sport", "Thriller", "War", "Western"]
 
 """ Prepare Dataset for GPT2 """
 class GPT2Dataset(Dataset):
@@ -82,12 +88,15 @@ def get_formatted_script_scenes(scripts_dir, num_scripts=0):
 """ Get list of formatted call/responses for training """
 def get_formatted_call_responses(scripts_dir, num_scripts=0):
     lines = []
-    for i, filename in enumerate(os.listdir(scripts_dir)):
-        if num_scripts > 0 and i >= num_scripts:
-            break
+    for g in GENRES:
+      genre_emotion_dir = os.path.join(scripts_dir, g, EMOTIONS)
+      print(genre_emotion_dir)
+      for i, filename in enumerate(os.listdir(genre_emotion_dir)):
+          if num_scripts > 0 and i >= num_scripts:
+              break
 
-        with open(os.path.join(scripts_dir, filename)) as f:
-            lines += "".join(f.readlines()).split("---")
+          with open(os.path.join(genre_emotion_dir, filename)) as f:
+              lines += "".join(f.readlines()).split("---")
     return lines
 
 
@@ -271,7 +280,7 @@ if __name__ == "__main__":
 
     # Inititalize dataset
     print("Preparing data...")
-    lines = get_formatted_call_responses(READ_SCRIPTS_DIR, NUM_TRAIN_SCRIPTS)
+    lines = get_formatted_call_responses(READ_SCRIPTS_BASE_DIR, NUM_TRAIN_SCRIPTS)
     dataset = GPT2Dataset(lines, tokenizer, max_length=256)
 
     # Split into training and validation sets
