@@ -34,7 +34,7 @@ def evaluate(filepaths):
 if __name__=='__main__':
 	
 	print("Evaluating...")
-	report, mean_averages = evaluate(filepaths=PATHS)
+	report, _, _ = evaluate(filepaths=PATHS)
 	formatted_results = f"RESULTS\n{report}"
 
 	if not os.path.exists(SAVE_RESULTS_DIR):
