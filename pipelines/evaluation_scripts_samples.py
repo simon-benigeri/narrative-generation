@@ -6,6 +6,7 @@ import os
 import random
 from typing import List
 import torch
+import json
 from sklearn.metrics import classification_report
 from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM, GPT2Tokenizer, GPT2Config, \
     GPT2LMHeadModel
@@ -18,6 +19,11 @@ THRESHOLD = float(os.environ.get('THRESHOLD', 0.7))
 TARGET_EMOTION = os.environ.get('TARGET_EMOTION', "")
 NUM_SAMPLES = int(os.environ.get('NUM_SAMPLES', 1))
 NUM_PROMPTS = int(os.environ.get('NUM_PROMPTS', 10))
+
+SAVE_PROMPTS = bool(os.environ.get('SAVE_PROMPTS', True))
+LOAD_PROMPTS = bool(os.environ.get('LOAD_PROMPTS', False))
+TEST_SET_DIR = os.environ.get('TEST_SET_DIR', '../models/temp/test_sets')
+
 GENRES = genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy",
                    "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short",
                    "Sport", "Thriller", "War", "Western"]
@@ -204,8 +210,26 @@ if __name__ == '__main__':
 
     print("Generating...")
 
-    call_responses = get_formatted_call_responses(scripts_dir=SCRIPTS_DIR)
-    prompts = sample_prompts(num_prompts=NUM_PROMPTS, call_responses=call_responses, response_emotion='neutral')
+    if LOAD_PROMPTS:
+        print("Loading prompts...")
+        with open(TEST_SET_DIR + f"/test_set__{NUM_PROMPTS}_prompts.json") as f:
+            prompts = json.load(f)['PROMPTS']
+    else:
+        print("Sampling prompts...")
+        call_responses = get_formatted_call_responses(scripts_dir=SCRIPTS_DIR)
+        prompts = sample_prompts(num_prompts=NUM_PROMPTS, call_responses=call_responses, response_emotion='neutral')
+
+    if SAVE_PROMPTS:
+        print("Saving prompts...")
+        if not os.path.exists(TEST_SET_DIR):
+            os.makedirs(TEST_SET_DIR)
+        test_set = {
+            'NUM_PROMPTS': NUM_PROMPTS,
+            'PROMPTS': prompts,
+            'EMOTION': 'neutral'
+        }
+        with open(TEST_SET_DIR + f"/test_set__{NUM_PROMPTS}_prompts.json", "w") as f:
+            json.dump(test_set, f)
 
     # Get list of generated call responses
     generated = []
