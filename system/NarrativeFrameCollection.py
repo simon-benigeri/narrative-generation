@@ -1,7 +1,9 @@
 import json
 
+# NOTE: Created since we thought we may need a clean way to access only a subset of narrative frames based on some criterea
+
 """
-Component to hold narrative frames
+Interface for accessing narrative frames
 """
 class NarrativeFrameCollection:
     def __init__(self):
@@ -12,5 +14,3 @@ class NarrativeFrameCollection:
     # Get all frames from collection
     def retrieve_all(self):
         return self.frames
-    
-    # Maybe other retrieve methods to get a certain subset of frames for future steps

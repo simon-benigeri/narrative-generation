@@ -36,6 +36,7 @@ class NarrativeController:
         return self.characters[0], self.characters[1]
     
     """ Generate narrative script using components """
+    # NOTE: Pretty much all of how this generation loop works is undecided
     def generate_script(self):
         # Generate script until all character arcs are complete 
         while not self.script.is_complete:

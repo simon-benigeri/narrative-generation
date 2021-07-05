@@ -8,6 +8,7 @@ from system.Character import Character
 from system.Planners import Planners
 from system.Emotions import Emotions
 
+# NOTE: How this class should work, its purpose, and existence is undecided
 
 """ Component to generate script direction and guide story """
 class NarrativePlanner:
@@ -65,7 +66,7 @@ class NarrativePlanner:
         # return "(screen direction)"
         return generated
 
-
+# Test
 if __name__=='__main__':
     # Define characters
     alice = Character(name="Alice", arc=[Emotions.ANGER, Emotions.ANGER, Emotions.HAPPINESS])

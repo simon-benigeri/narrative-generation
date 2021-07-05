@@ -1,0 +1,26 @@
+# Emotions
+EMOTIONS: ["joy", "sadness", "anger", "fear", "surprise", "love"]
+
+# https://www.calmsage.com/understanding-the-emotion-wheel/
+EMOTIONS_PLUTCHIK_42: [
+    # Happy
+    "playful", "content", "interested", "proud", "accepted", "powerful", "peaceful", "trusting", "optimistic",
+    # Sad
+    "lonely", "vulnerable", "despair", "guilty", "depressed", "hurt",
+    # Disgusted
+    "repelled", "awful", "disappointed", "disapproving",
+    # Angry
+    "critical", "distant", "frustrated", "aggressive", "mad", "bitter", "humiliated", "disillusioned",
+    # Fearful
+    "threatened", "rejected", "weak", "insecure", "anxious", "scared",
+    # Bad
+    "bored", "busy", "stressed", "tired",
+    # Surprised
+    "startled", "confused", "amazed", "excited"
+]
+EMOTIONS_PLUTCHIK_84: [
+    # "betrayed", "resentful", "disrespected", "ridiculed", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed", "withdrawn", "numb", "skeptical", "dismissive",
+]
+
+# Genres
+GENRES: ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short", "Sport", "Thriller", "War", "Western"]

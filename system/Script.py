@@ -4,7 +4,7 @@ from .Emotions import Emotions
 from .Character import Character
 
 """
-Component to hold the script
+Component to hold the script and an interface to read and write to it
 """
 class Script:
     # Named tuple for a single line in the script

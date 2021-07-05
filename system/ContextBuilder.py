@@ -13,21 +13,18 @@ Component to condition dialogue generation
 """
 class ContextBuilder:
     def __init__(self):
-        # ...
-        #TODO: make out own model
-        # the model we use is here: https://huggingface.co/deepset/roberta-base-squad2
+        # Using prebuilt model, can be found here: https://huggingface.co/deepset/roberta-base-squad2
         model_name = "deepset/roberta-base-squad2"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModelForQuestionAnswering.from_pretrained(model_name)
 
     """ Select a narrative frame to build context around """
     def select_frame(self, script:Script, characters: List[Character], narrative_frame_collection: NarrativeFrameCollection) -> (dict, List[Tuple]):
-        # Gat available frames
+        # Get available frames
         frames = narrative_frame_collection.retrieve_all()
 
         # Look through frames for emotion matches
         candidate_frames = []
-
         for frame in frames:
             # NOTE: For now we assume character bindings will be a one-to-one map between characters and frame.characters
             character_bindings = list(zip(characters, frame["characters"]))
@@ -81,7 +78,7 @@ class ContextBuilder:
 
         Returns: answer from the text
         """
-        #TODO: do we add special tokens?
+        #TODO: do we need to add special tokens?
         inputs = self.tokenizer(question, context, add_special_tokens=True, return_tensors="pt")
         input_ids = inputs["input_ids"].tolist()[0]
 
@@ -112,6 +109,7 @@ class ContextBuilder:
         # Join centextualized events into string
         return " ".join(contextualized_attributes)
 
+# Test
 if __name__=='__main__':
     from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
 

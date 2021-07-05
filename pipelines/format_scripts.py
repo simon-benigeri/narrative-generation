@@ -5,6 +5,7 @@ import os
 import re
 import json
 import numpy as np
+from utils import *
 
 EMOTION_THRESHOLD = 0.7
 
@@ -17,20 +18,11 @@ END_LINE_TAG = "<end-line>\n"
 
 NEW_CALL_RESPONSE_TAG = "---\n"
 
-# Softmax emotion dict if currently in score values
-def softmax_emotions(emotion_dict):
-    scores = np.array(list(emotion_dict.values()))
-    probs = np.exp(scores) / np.sum(np.exp(scores))
-    return dict(zip(list(emotion_dict.keys()), probs.tolist()))
+# Get all config values and hyperparameters
+with open("config.yml", "r") as ymlfile:
+    config = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-# Get emotion from emotion dict
-def get_emotion(emotion_dict, threshold=EMOTION_THRESHOLD):
-    scores=list(emotion_dict.values())
-    if max(scores)>threshold:
-        return list(emotion_dict.keys())[scores.index(max(scores))]
-    return "neutral"
-
-# Format call response
+""" Format script dialogues into single call-response format """
 def format_call_response(script_dict, include_character=True, include_emotion=True, allowed_response_emotion=""):
     call_responses = []
     for scene in script_dict["scenes"]:
@@ -58,7 +50,7 @@ def format_call_response(script_dict, include_character=True, include_emotion=Tr
     
     return NEW_CALL_RESPONSE_TAG.join(call_responses)
 
-# Format individual json script
+""" Format script into context-dialogues format """
 def format_script(script_dict, include_emotion=True):
     formatted_script = []
     for scene in script_dict["scenes"]:
@@ -105,6 +97,7 @@ def format_script(script_dict, include_emotion=True):
     
     return "\n<new-scene>\n".join(formatted_script)
 
+""" Save format as text file """
 def save_formatted_script(dir, filename, formatted_script):
     if not ".txt" in filename:
         filename += ".txt"
@@ -112,6 +105,7 @@ def save_formatted_script(dir, filename, formatted_script):
     with open(os.path.join(dir, filename), 'w') as f:
         f.write(formatted_script)
 
+""" Format all scripts """
 def format_scripts(load_dir, save_dir, format_type="whole_script", include_character=True, include_emotion=True, allowed_response_emotion=""):
     # Create save directory if it doesn't exist
     if not os.path.exists(save_dir):
@@ -139,24 +133,9 @@ def format_scripts(load_dir, save_dir, format_type="whole_script", include_chara
     print("Done")
 
 if __name__ == '__main__':
-    emotions = ["joy", "sadness", "anger", "fear", "surprise", "love"]
-    genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy", "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short", "Sport", "Thriller", "War", "Western"]
-    for g in genres:
-      print("Formatting ", g)
-      for e in emotions:
-          print("Formatting ", e)
-
-          if g == "Action":
-              print("Action format won't work")
-          else:
-              format_scripts(JSON_SCRIPTS_DIR + "/" + g, FORMATTED_CALL_RESPONSE_DIR + "/" + g + "/" + e, format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion=e)
-          
-              
-
-    """
-    with open(os.path.join(JSON_SCRIPTS_DIR, "kungfupanda.json"), 'r') as f:
-        script_dict = json.load(f)
-
-    print(format_call_response(script_dict, include_character=True, include_emotion=True))
-    """
-    
+    for g in config.GENRES:
+        print("Formatting ", g)
+        for e in config.EMOTIONS:
+            print("Formatting ", e)
+            format_scripts(JSON_SCRIPTS_DIR + "/" + g, FORMATTED_CALL_RESPONSE_DIR + "/" + g + "/" + e, format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion=e)
+        

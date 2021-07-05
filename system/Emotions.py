@@ -1,5 +1,6 @@
 import enum
 
+# TODO may be better just to use string rather than enum since emotions we use keep changing
 class Emotions(enum.Enum):
     NEUTRAL = 0
     HAPPINESS = 1

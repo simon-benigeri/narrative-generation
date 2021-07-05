@@ -11,7 +11,6 @@ from sklearn.metrics import classification_report
 from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM, GPT2Tokenizer, GPT2Config, \
     GPT2LMHeadModel
 
-EMOTIONS = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
 SCRIPTS_DIR = os.environ.get('LOAD_SCRIPT_DATA_DIR', '../data/processed/formatted/call_responses/')
 LOAD_DIALOGUE_MODEL_DIR = os.environ.get('LOAD_DIALOGUE_MODEL_DIR', 'models/temp/model_save')
 SAVE_RESULTS_DIR = os.environ.get('SAVE_RESULTS_DIR', 'models/temp/results_samples')
@@ -28,13 +27,16 @@ GENRES = genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "C
                    "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short",
                    "Sport", "Thriller", "War", "Western"]
 
+# Get all config values and hyperparameters
+with open("config.yml", "r") as ymlfile:
+    config = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 def get_emotion_scores(model, tokenizer, text):
     input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
     output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True, output_scores=True)
 
     # Get emotion label scores
-    emotions = ['joy', 'love', 'fear', 'sadness', 'anger', 'surprise']
+    emotions = config.EMOTIONS
     emotion_scores = [
         output.scores[0][0][tokenizer.encode('joy')[0]].item(),
         output.scores[0][0][tokenizer.encode('love')[0]].item(),
@@ -72,7 +74,7 @@ def evaluate(model, tokenizer, samples, emotion_tags_included=True, target_respo
     y_true = df['target_labels'].to_numpy()
     y_pred = df['predicted_labels'].to_numpy()
 
-    report = classification_report(y_true, y_pred, labels=EMOTIONS, target_names=EMOTIONS)
+    report = classification_report(y_true, y_pred, labels=config.EMOTIONS, target_names=config.EMOTIONS)
     mean_averages = df.groupby('target_labels')['target_confidence'].mean()
 
     return report, mean_averages, y_pred
@@ -85,8 +87,8 @@ def _get_emotion(model, tokenizer, call_response):
     try:
         scores = get_emotion_scores(model, tokenizer, response)
 
-        predicted = EMOTIONS[scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
-        target_confidence = scores[EMOTIONS.index(target)]
+        predicted = config.EMOTIONS[scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
+        target_confidence = scores[config.EMOTIONS.index(target)]
         predicted_confidence = max(scores) if max(scores) > THRESHOLD else 1 - max(scores)
 
     except Exception as e:

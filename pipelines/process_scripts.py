@@ -12,46 +12,8 @@ RAW_SCRIPTS_DIR = os.environ.get('RAW_SCRIPTS_DIR', "data/raw/ScreenPyOutput")
 PROCESSED_SCRIPTS_DIR = os.environ.get('PROCESSED_SCRIPTS_DIR', "data/processed/json")
 PROCESS_GENRES = os.environ.get('PROCESS_GENRES', "Action").split(" ") # Genres to process (seperated by a space)
 MAX_SCRIPTS_PROCESS = int(os.environ.get('MAX_SCRIPTS_PROCESS', "0"))
-EMOTION_SCORE_THRESHOLD = 4
 
-# https://www.calmsage.com/understanding-the-emotion-wheel/
-
-EMOTIONS_6 = ["joy", "love", "anger", "fear", "sadness", "surprise"]
-
-EMOTIONS_PLUTCHIK_42 = [
-  # Happy
-  "playful", "content", "interested", "proud", "accepted", "powerful", "peaceful", "trusting", "optimistic",
-  # Sad
-  "lonely", "vulnerable", "despair", "guilty", "depressed", "hurt",
-  # Disgusted
-  "repelled", "awful", "disappointed", "disapproving",
-  # Angry
-  "critical", "distant", "frustrated", "aggressive", "mad", "bitter", "humiliated", "disillusioned",
-  # Fearful
-  "threatened", "rejected", "weak", "insecure", "anxious", "scared",
-  # Bad
-  "bored", "busy", "stressed", "tired",
-  # Surprised
-  "startled", "confused", "amazed", "excited"
-]
-
-EMOTIONS_PLUTCHIK_84 = [
-  # "betrayed", "resentful", "disrespected", "ridiculed", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed", "withdrawn", "numb", "skeptical", "dismissive",
-]
-
-def get_emotion(text, emotions=EMOTIONS_6):
-    input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
-    output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True,  output_scores=True)
-
-    # Get emotion label scores
-    emotion_scores = [
-        output.scores[0][0][tokenizer.encode(e)[0]].item() for e in emotions
-    ]
-
-    dec = [tokenizer.decode(ids) for ids in output.sequences]
-
-    return dict(zip(emotions, list(map(float, emotion_scores))))
-
+""" Process single script that is in he ScreenPy format """
 def process_screenpy_script(script_dict, title, genre):
     # Process and append each stage direction and utterance in each scene into a new script
     processed_script_dict = {
@@ -59,6 +21,8 @@ def process_screenpy_script(script_dict, title, genre):
         "genre":genre,
         "scenes":[]
     }
+
+    # Process each scene
     for scene in script_dict:
         processed_scene_lines = []
         skip_next = False
@@ -109,7 +73,7 @@ def process_screenpy_script(script_dict, title, genre):
     
     return processed_script_dict
     
-
+""" Check if major errors in script in ScreenPy format exist """
 def is_screenpy_script_valid(script_dict):
     # Skip if empty script
     if len(script_dict) == 0:
@@ -129,7 +93,8 @@ def is_screenpy_script_valid(script_dict):
     
     # All good if we get here
     return True
-    
+
+""" Save processed script in json format """
 def save_script_dict(dir, filename, script_dict):
     if not ".json" in filename:
         filename += ".json"
@@ -141,6 +106,7 @@ def save_script_dict(dir, filename, script_dict):
     with open(os.path.join(dir, filename), 'w') as f:
         json.dump(script_dict, f)
 
+""" Process all scripts in the ScreenPy format """
 def process_screenpy_scripts(load_dir, save_dir, process_genres=[]):
     num_processed = 0
     num_skipped = 0
@@ -195,17 +161,6 @@ if __name__ == '__main__':
     model = AutoModelWithLMHead.from_pretrained("mrm8488/t5-base-finetuned-emotion")
 
     process_screenpy_scripts(RAW_SCRIPTS_DIR, PROCESSED_SCRIPTS_DIR, process_genres=PROCESS_GENRES)
-    
-    """
-    with open(os.path.join(RAW_SCRIPTS_DIR + "/Action/avatar.json"), 'r') as f:
-        script_dict = json.load(f)
-    
-    sd = process_screenpy_script(script_dict, "...", "Action")
-
-    for s in sd["scenes"]:
-        for l in s["lines"]:
-            print(l)
-    """
 
     
 
