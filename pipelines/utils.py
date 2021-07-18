@@ -2,6 +2,7 @@ import os
 import re
 import json
 import numpy as np
+import yaml
 
 with open("config.yml", "r") as ymlfile:
     config = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -13,15 +14,15 @@ def softmax_emotions(emotion_dict):
     return dict(zip(list(emotion_dict.keys()), probs.tolist()))
 
 # Get emotion from emotion dict
-def get_emotion(emotion_dict, threshold=EMOTION_THRESHOLD):
+def get_emotion(emotion_dict, threshold):
     scores=list(softmax_emotions(emotion_dict).values())
     if max(scores)>threshold:
         return list(emotion_dict.keys())[scores.index(max(scores))]
     return "neutral"
 
-def get_emotion_scores(text, emotions=config.EMOTIONS):
+def get_emotion_scores(text, model, tokenizer, emotions=config["EMOTIONS"]):
     input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
-    output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True,  output_scores=True)
+    output = model.generate(input_ids=input_ids, max_length=30, return_dict_in_generate=True,  output_scores=True)
 
     # Get emotion label scores
     emotion_scores = [

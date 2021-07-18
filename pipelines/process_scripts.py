@@ -7,6 +7,7 @@ import json
 import re
 import torch
 from transformers import AutoTokenizer, AutoModelWithLMHead
+from utils import *
 
 RAW_SCRIPTS_DIR = os.environ.get('RAW_SCRIPTS_DIR', "data/raw/ScreenPyOutput")
 PROCESSED_SCRIPTS_DIR = os.environ.get('PROCESSED_SCRIPTS_DIR', "data/processed/json")
@@ -58,9 +59,10 @@ def process_screenpy_script(script_dict, title, genre):
                 processed_scene_lines.append({
                     "type":"utterance",
                     "character":character_name,
-                    "emotion": get_emotion(line["text"]),
+                    "emotion": get_emotion_scores(line["text"], model, tokenizer),
                     "text":text
                 })
+
 
         # Add scene to processed script
         processed_script_dict["scenes"].append({

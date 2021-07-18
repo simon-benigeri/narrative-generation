@@ -133,9 +133,9 @@ def format_scripts(load_dir, save_dir, format_type="whole_script", include_chara
     print("Done")
 
 if __name__ == '__main__':
-    for g in config.GENRES:
+    for g in config["GENRES"]:
         print("Formatting ", g)
-        for e in config.EMOTIONS:
+        for e in config["EMOTIONS"]:
             print("Formatting ", e)
             format_scripts(JSON_SCRIPTS_DIR + "/" + g, FORMATTED_CALL_RESPONSE_DIR + "/" + g + "/" + e, format_type="call_response", include_character=False, include_emotion=False, allowed_response_emotion=e)
         
