@@ -10,6 +10,7 @@ import json
 from sklearn.metrics import classification_report
 from transformers import AutoTokenizer, AutoModelWithLMHead, AutoModelForSeq2SeqLM, GPT2Tokenizer, GPT2Config, \
     GPT2LMHeadModel
+from utils import *
 
 SCRIPTS_DIR = os.environ.get('LOAD_SCRIPT_DATA_DIR', '../data/processed/formatted/call_responses/')
 LOAD_DIALOGUE_MODEL_DIR = os.environ.get('LOAD_DIALOGUE_MODEL_DIR', 'models/temp/model_save')
@@ -23,36 +24,30 @@ SAVE_PROMPTS = bool(os.environ.get('SAVE_PROMPTS', True))
 LOAD_PROMPTS = bool(os.environ.get('LOAD_PROMPTS', False))
 TEST_SET_DIR = os.environ.get('TEST_SET_DIR', '../models/temp/test_sets')
 
-GENRES = genres = ["Action", "Adventure", "Animation", "Biography", "Comedy", "Crime", "Drama", "Family", "Fantasy",
-                   "Film-Noir", "History", "Horror", "Music", "Musical", "Mystery", "Romance", "Sci-Fi", "Short",
-                   "Sport", "Thriller", "War", "Western"]
+
+SAMPLE_PROMPTS = [
+      "C: Hey, what happened?\nR: ",
+      "C: What did they say?\nR: ",
+      "C: So, how did it go?\nR: ",
+      "C: How do you feel?\nR: ",
+      "C: I guess we have to.\nR: ",
+      "C: It's over.\nR: ",
+      "C: I have to go find him now.\nR: ",
+      "C: The party was yesterday.\nR: ",
+      "C: How are we going to break the news to him?\nR: ",
+      "C: Wow! He actually won.\nR: ",
+      "C: We have to leave.\nR: ",
+      "C: You have to stop doing that.\nR: ",
+      "C: Explain what happened.\nR: ",
+      "C: Why did you do this?\nR: ",
+      "C: How do you think it's going to go?\nR: ",
+    ]
 
 # Get all config values and hyperparameters
 with open("config.yml", "r") as ymlfile:
     config = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-def get_emotion_scores(model, tokenizer, text):
-    input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
-    output = model.generate(input_ids=input_ids, max_length=2, return_dict_in_generate=True, output_scores=True)
-
-    # Get emotion label scores
-    emotions = config.EMOTIONS
-    emotion_scores = [
-        output.scores[0][0][tokenizer.encode('joy')[0]].item(),
-        output.scores[0][0][tokenizer.encode('love')[0]].item(),
-        output.scores[0][0][tokenizer.encode('fear')[0]].item(),
-        output.scores[0][0][tokenizer.encode('sadness')[0]].item(),
-        output.scores[0][0][tokenizer.encode('anger')[0]].item(),
-        output.scores[0][0][tokenizer.encode('surprise')[0]].item()
-    ]
-
-    dec = [tokenizer.decode(ids) for ids in output.sequences]
-    label = re.sub(r'\<[^)]*\>', '', dec[0]).strip()
-    scores = list(map(float, list(torch.nn.functional.softmax(torch.tensor(emotion_scores), dim=0).detach().numpy())))
-
-    return scores
-
-
+""" Evaluate how well the predicted emotion label with the original emotion label """
 def evaluate(model, tokenizer, samples, emotion_tags_included=True, target_response_emotion=""):
     outputs = np.array([list(_get_emotion(model, tokenizer, sample)) for sample in samples])
     df = pd.DataFrame(data=outputs,
@@ -79,7 +74,7 @@ def evaluate(model, tokenizer, samples, emotion_tags_included=True, target_respo
 
     return report, mean_averages, y_pred
 
-
+""" Get predicted and actual score of response along with respective confidence of each """
 def _get_emotion(model, tokenizer, call_response):
     target = call_response["response"]["emotion"]
     response = call_response["response"]["text"]
@@ -87,8 +82,8 @@ def _get_emotion(model, tokenizer, call_response):
     try:
         scores = get_emotion_scores(model, tokenizer, response)
 
-        predicted = config.EMOTIONS[scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
-        target_confidence = scores[config.EMOTIONS.index(target)]
+        predicted = config["EMOTIONS"][scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
+        target_confidence = scores[config["EMOTIONS"].index(target)]
         predicted_confidence = max(scores) if max(scores) > THRESHOLD else 1 - max(scores)
 
     except Exception as e:
@@ -99,25 +94,7 @@ def _get_emotion(model, tokenizer, call_response):
 
     return (target, target_confidence, predicted, predicted_confidence)
 
-
-def generate_samples(model, tokenizer, prompt, num_samples=1):
-    model.eval()
-    generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
-    generated = generated.to(model.device)
-
-    sample_outputs = model.generate(
-        generated,
-        # bos_token_id=random.randint(1,30000),
-        do_sample=True,
-        top_k=50,
-        max_length=300,
-        top_p=0.90,
-        num_return_sequences=num_samples
-    )
-
-    return [tokenizer.decode(sample_output, skip_special_tokens=True) for sample_output in sample_outputs]
-
-
+""" Convert call-response text into dict """
 def get_call_response_dict(generated, target_emotion="", allow_empty=False):
     generated_call_responses = []
     generated_original = []
@@ -163,6 +140,7 @@ def get_formatted_call_responses(scripts_dir:str = SCRIPTS_DIR, num_scripts=0):
 
     return lines
 
+""" Randomly select calls from call_responses as prompts """
 def sample_prompts(call_responses:List[str], num_prompts:int = NUM_PROMPTS,threshold:int = 15, response_emotion:str = 'neutral'):
     prompts = []
 
@@ -192,7 +170,6 @@ def sample_prompts(call_responses:List[str], num_prompts:int = NUM_PROMPTS,thres
 
 
 if __name__ == '__main__':
-
     print("Loading models...")
     print("Loading T5 emotion tagger...")
     # Load emotion model
