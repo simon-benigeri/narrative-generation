@@ -111,28 +111,46 @@ Eventually, the goal is not just to include emotional information, but also info
 
 2. Tradeoff between emotion & coherence. Can we propose a test for this?
 
-3. Improve
+3. Improving the data:
+  - emotion tagging could be better
+  - script parsing could be better
+  - possible datasets:
+    - ![Cornell Movie Dialogue Corpus](https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html). Ideal if we focus on dialogue. Description: A large metadata-rich collection of fictional conversations extracted from raw movie scripts. (220,579 conversational exchanges between 10,292 pairs of movie characters in 617 movies).
+    - IMDBS. Includes scenes and dialogue but we need to match them.
+    - Other conversation datasets can be found on ![ConvoKit](https://convokit.cornell.edu/)
 
-### Proposed Formats:
+4. Adding context:
+  - directions
+  - more lines of dialogue in prompt
+  - Proposed Formats:
+  ```
+	<dialogue-start>
 
-<dialogue-start>
+		<context-start>Bob is watching TV. It is midnight.<context-end>
 
-	<context-start>Bob is watching TV. It is midnight.<context-end>
+		<characters-start>
+			Bob: (Emotion: Sad, Goal: Get mind off work, Outcome: Unable to get mind off work)
+			Alice: (Emotion: Neutral, Goal: Figure out what happened, Outcome: Learn what happened)
+		<characters-end>
 
-	<characters-start>
-		Bob: (Emotion: Sad, Goal: Get mind off work, Outcome: Unable to get mind off work)
-		Alice: (Emotion: Neutral, Goal: Figure out what happened, Outcome: Learn what happened)
-	<characters-end>
-
-	<utterances-start>
-		Alice: Are you okay? You’ve been pretty quiet.
-		Bob: Yeah I’m fine.
-<utterances-end>
-<dialogue-end>
+		<utterances-start>
+			Alice: Are you okay? You’ve been pretty quiet.
+			Bob: Yeah I’m fine.
+	<utterances-end>
+	<dialogue-end>
+  ```
 
 In this case, special tokens for each start and end tag need to be added into the tokenizer. This is just a proposal and can likely be simplified to make training for the model easier.
 
 Creating these formats from the emotion tagged JSON to train the model take only a couple seconds to run and are saved under data/processed/formatted.
+
+5. Does a medium model trained on all emotions do better?
+
+6. Can we use (emotion) as controlling tokens?
+  - used in controllable text simplification reasearch
+
+7. Can we used any ideas from [this list of controllable text generation methods](https://lilianweng.github.io/lil-log/2021/01/02/controllable-neural-text-generation.html)
+
 
 
 ### Core Questions
