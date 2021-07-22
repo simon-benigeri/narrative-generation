@@ -115,9 +115,9 @@ Eventually, the goal is not just to include emotional information, but also info
   - emotion tagging could be better
   - script parsing could be better
   - possible datasets:
-    - ![Cornell Movie Dialogue Corpus](https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html). Ideal if we focus on dialogue. Description: A large metadata-rich collection of fictional conversations extracted from raw movie scripts. (220,579 conversational exchanges between 10,292 pairs of movie characters in 617 movies).
+    - [Cornell Movie Dialogue Corpus](https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html). Ideal if we focus on dialogue. Description: A large metadata-rich collection of fictional conversations extracted from raw movie scripts. (220,579 conversational exchanges between 10,292 pairs of movie characters in 617 movies).
     - IMDBS. Includes scenes and dialogue but we need to match them.
-    - Other conversation datasets can be found on ![ConvoKit](https://convokit.cornell.edu/)
+    - Other conversation datasets can be found on [ConvoKit](https://convokit.cornell.edu/)
 
 4. Adding context:
   - directions
