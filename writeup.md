@@ -52,6 +52,34 @@ Dialogue. Specifically, we tried to get language models to respond to a dialogue
 ## Experiment: Controlling the emotion of the response provided by a dialogue transformer.
 
 ### Task
+Dialogue format is call and response:
+```
+C: Okay, I’ll tell you. Do you know the muffin man?
+R: The muffin man?
+C: Yeah. If you're looking for muffins, you should talk to him.
+R: Where can I find the muffin man?
+```
+Input:
+```
+C: Yeah. If you're looking for muffins, you should talk to him.
+R:
+```
+Output:
+```
+C: Yeah. If you're looking for muffins, you should talk to him.
+R: <Coherent response>
+```
+Where Emotion of R is the target emotion.
+
+There were many ways we could have gone about conditioning the models to generate text of a specific emotion. One would be to train a single large model with this format, with emotion tags added in…
+
+C (fear): Okay, I’ll tell you. Do you know the muffin man?
+R (neutral): The muffin man?
+
+Another we tried was to train a small model for each emotion and train it only on the data for where the response was tagged with that emotion. For example, a model trained on joy would be given the following format...
+
+C: How did the game go?
+R: We won!
 We fine-tune tranformers to generate a call and response to...
 
 Emotion specific transformers
