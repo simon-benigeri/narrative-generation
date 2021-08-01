@@ -25,6 +25,10 @@ def get_emotion_scores(text, model, tokenizer, emotions=config["EMOTIONS"]):
     input_ids = tokenizer.encode(text + '</s>', return_tensors='pt')
     output = model.generate(input_ids=input_ids, max_length=30, return_dict_in_generate=True,  output_scores=True)
 
+    # Trim to max length
+    if len(input_ids[0]) > 512:
+        input_ids = input_ids[:,:512]
+        
     # Get emotion label scores
     emotion_scores = [
         output.scores[0][0][tokenizer.encode(e)[0]].item() for e in emotions
