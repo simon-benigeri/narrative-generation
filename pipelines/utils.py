@@ -38,8 +38,29 @@ def get_emotion_scores(text, model, tokenizer, emotions=config["EMOTIONS"]):
 
     return dict(zip(emotions, list(map(float, emotion_scores))))
 
+
+def batch_get_emotion_scores(texts, model, tokenizer, emotions=config["EMOTIONS"]):
+    # TODO: Batch
+    texts = [ text + '</s>' for text in texts]
+    input_ids = tokenizer.encode(texts, return_tensors='pt')
+    output = model.generate(input_ids=input_ids, max_length=30, return_dict_in_generate=True, output_scores=True)
+
+    # Trim to max length
+    if len(input_ids[0]) > 512:
+        input_ids = input_ids[:, :512]
+
+    # Get emotion label scores
+    emotion_scores = [
+        output.scores[0][0][tokenizer.encode(e)[0]].item() for e in emotions
+    ]
+
+    dec = [tokenizer.decode(ids) for ids in output.sequences]
+
+    return dict(zip(emotions, list(map(float, emotion_scores))))
+
 """ Generated text from model given prompt and number of desired samples """
 def generate_samples(model, tokenizer, prompt, num_samples=1):
+    # TODO: Batch
     model.eval()
     generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
     generated = generated.to(model.device)

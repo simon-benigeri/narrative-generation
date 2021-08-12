@@ -51,6 +51,8 @@ with open("config.yml", "r") as ymlfile:
 
 """ Evaluate how well the predicted emotion label with the original emotion label """
 def evaluate(model, tokenizer, samples, emotion_tags_included=True, target_response_emotion=""):
+    #TODO: sending a list of sentences handles batching
+    # batch: outputs = np.array(_batch_get_emotion(model, tokenizer, samples))
     outputs = np.array([list(_get_emotion(model, tokenizer, sample)) for sample in samples])
     df = pd.DataFrame(data=outputs,
                       columns=['target_labels', 'target_confidence', 'predicted_labels', 'predicted_confidence'])
@@ -78,6 +80,27 @@ def evaluate(model, tokenizer, samples, emotion_tags_included=True, target_respo
 
 """ Get predicted and actual score of response along with respective confidence of each """
 def _get_emotion(model, tokenizer, call_response):
+    target = call_response["response"]["emotion"]
+    response = call_response["response"]["text"]
+
+    try:
+        scores = get_emotion_scores(model, tokenizer, response)
+
+        predicted = config["EMOTIONS"][scores.index(max(scores))] if max(scores) > THRESHOLD else "neutral"
+        target_confidence = scores[config["EMOTIONS"].index(target)]
+        predicted_confidence = max(scores) if max(scores) > THRESHOLD else 1 - max(scores)
+
+    except Exception as e:
+        print('Error with : ', response, " : ", e)
+        predicted = None
+        target_confidence = None
+        predicted_confidence = None
+
+    return (target, target_confidence, predicted, predicted_confidence)
+
+""" _get_emotion with batching """
+def _batch_get_emotion(model, tokenizer, samples, batch_size):
+    # TODO: batching
     target = call_response["response"]["emotion"]
     response = call_response["response"]["text"]
 

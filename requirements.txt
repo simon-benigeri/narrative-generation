@@ -11,3 +11,4 @@ datasets
 sentencepiece
 protobuf
 pandas
+pyyaml
